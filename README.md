@@ -5,7 +5,7 @@ This is a small Node.js WebSocket relay. CS2 still runs movement, collision and 
 ## 1. Put the server on GitHub
 
 1. Unzip `relay-server.zip` into a new empty folder.
-2. Create a new GitHub repository. A private repository is fine. Call it `cs2-emote-relay`.
+2. Create a new GitHub repository called `cs2-emote-relay`. **Public is fine** and lets other people inspect and host their own relay. A private repository works too.
 3. Open the repository and choose **Add file → Upload files**.
 4. Upload the **contents** of the extracted folder. You should see `server.js`, `package.json`, `package-lock.json`, `catalog.json` and `render.yaml` at the repository's top level. Do not upload `node_modules`.
 5. Commit the upload.
@@ -31,14 +31,22 @@ If you instead upload this entire source workspace, the server lives under `rela
    | Instance Type | Free for testing, paid for reliable availability |
    | Health Check Path | `/healthz` |
 
-5. Under Environment, add `RELAY_TOKEN`. Generate a long random value and keep it private. Every participating client needs the same value. Do not commit it to GitHub.
+5. Under Environment, set `RELAY_TOKEN` to the access code used by your clients. For the supplied DLL's default server, use the distributed code configured in `src/core/Config.h`. This code is visible to everyone receiving the DLL or config; it is **not a private credential or proof of player identity**. A self-hosted relay can use its own shared code, or omit `RELAY_TOKEN` to accept clients without one. Keep actual hosting credentials and API keys private.
 6. Click **Deploy Web Service**. Wait for the log line `Emote relay listening; protocol 1` and a Live status.
 7. Render shows a URL such as `https://my-cs2-emotes.onrender.com`.
 8. Open `https://my-cs2-emotes.onrender.com/healthz`. A working server returns JSON containing `"ok":true`, a protocol number and a catalog ID.
 
 The server listens on Render's `PORT` automatically. You do not open a separate WebSocket port. Render supplies HTTPS/WSS certificates.
 
-## 3. Connect the DLL
+## 3. Point the DLL at the shared relay
+
+The DLL automatically connects to `wss://cs2-emote-relay.onrender.com/v1` with sharing ON by default. New configs receive these defaults. On injection, older configs automatically gain the missing sharing and join-key settings; missing or blank relay URL and default-server access-code fields are populated too. Existing OFF settings, custom addresses, room codes and key bindings are preserved. No config deletion, pack redownload or manual config editing is needed to use the default server with this DLL.
+
+The server's `RELAY_TOKEN` must match the DLL's distributed access code. This is a shared code visible in the DLL and config, not a private server secret. Hosting account passwords and API keys must never be put into the DLL or config.
+
+The following manual steps are only for connecting to a different, self-hosted relay:
+
+For automatic sharing in a match, every client must use the same relay URL and compatible emote catalog. The DLL automatically groups clients by the CS2 match ID and broadcasts active emotes; players do not need to enter a room code for a normal match. The **join key is only for taking a Fortnite group-emote role** (such as joining the Chugga-Chugga wagon). It is not needed to see another player's ordinary emote.
 
 1. Close CS2 before editing the config.
 2. Open **Documents → Emotes → emotes.ini**.
@@ -47,12 +55,11 @@ The server listens on Render's `PORT` automatically. You do not open a separate 
 ```ini
 multiplayer=1
 relay_url=wss://my-cs2-emotes.onrender.com/v1
-relay_token=YOUR_PRIVATE_RELAY_TOKEN
+relay_token=YOUR_SHARED_ACCESS_CODE
 relay_room=
-join_key=0x45
 ```
 
-`0x45` is E. Sharing defaults to ON even when older configs lack `multiplayer`.
+Sharing defaults to ON even when older configs lack `multiplayer`.
 
 4. Save the config, start CS2 and inject the new DLL.
 5. Open the wheel's Settings tab. **SHARE EMOTES** is animated and defaults to ON. Its subtitle reports the connection:
@@ -69,11 +76,11 @@ join_key=0x45
 6. Give each participant the same DLL version, emote pack, server URL and token.
 7. Join the same match and start a Fortnite emote. Other connected participants render it on your existing CS2 pawn. Players without this DLL see ordinary CS2 behavior.
 
-The DLL derives an automatic room from `C_CSGameRules.m_ullLocalMatchID`. Some local/community sessions expose zero or lack this field. For those sessions, put the same unique room code in everyone's `relay_room`. Use a different code for a different session.
+The DLL derives an automatic room from `C_CSGameRules.m_ullLocalMatchID`. Some local/community sessions expose zero or lack this field. For those matches, put the same unique room code in everyone's `relay_room`. Use a different code for a different session.
 
 ### Lobby / main menu
 
-Set `relay_room=friends-friday` (or another unique code) on every participant's client. A nonempty room is an explicit override in menus **and in matches**; clear it when you want automatic match grouping again.
+The main menu has no CS2 match ID to group by. For menu sharing, set the same `relay_room=friends-friday` (or another unique code) on every participant's client. A nonempty room is an explicit override in menus **and in matches**; clear it when you want automatic match grouping again. Automatic menu grouping would require a stable lobby identifier supplied by the game or a separate friend/lobby discovery service.
 
 The main menu lacks the remote in-match pawn entities. The DLL therefore draws up to seven remote Fortnite emote previews beside your local preview, using your available local agent model as the stand-in. It does not download another player's loadout. Native CS2 pose clips are shared in matches; lobby stand-ins use the Fortnite catalog.
 
