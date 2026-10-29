@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: cs2-emote-relay
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: RELAY_TOKEN
+        sync: false
+      - key: NODE_ENV
+        value: production

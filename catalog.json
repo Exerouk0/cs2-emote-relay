@@ -1,0 +1,1051 @@
+{
+  "protocol": 1,
+  "id": "fnemotes-32c2f681f839aa64df9d",
+  "emotes": [
+    {
+      "name": "Dance Moves",
+      "emote": "DanceMoves",
+      "entrance": 0,
+      "cycle": 6.8
+    },
+    {
+      "name": "Electro Shuffle",
+      "emote": "ElectroShuffle",
+      "entrance": 0,
+      "cycle": 8.4333
+    },
+    {
+      "name": "Aerobic",
+      "emote": "Emote_AerobicChamp",
+      "entrance": 0,
+      "cycle": 6.3
+    },
+    {
+      "name": "Best Mates",
+      "emote": "Emote_BandOfTheFort",
+      "entrance": 0,
+      "cycle": 0.5333
+    },
+    {
+      "name": "Bendy",
+      "emote": "Emote_Bendy",
+      "entrance": 0,
+      "cycle": 9.1
+    },
+    {
+      "name": "Blow Kiss",
+      "emote": "Emote_BlowKiss",
+      "entrance": 0,
+      "cycle": 2.6
+    },
+    {
+      "name": "Come To Me",
+      "emote": "Emote_Bring_It_On",
+      "entrance": 0,
+      "cycle": 4.4333
+    },
+    {
+      "name": "Calculated",
+      "emote": "Emote_Calculated",
+      "entrance": 0,
+      "cycle": 3.5
+    },
+    {
+      "name": "Capoeira",
+      "emote": "Emote_Capoeira",
+      "entrance": 0,
+      "cycle": 4.8333
+    },
+    {
+      "name": "Celebration",
+      "emote": "Emote_Celebration_Loop",
+      "entrance": 0,
+      "cycle": 2.9333
+    },
+    {
+      "name": "Flapper",
+      "emote": "Emote_Charleston",
+      "entrance": 0,
+      "cycle": 1.8333
+    },
+    {
+      "name": "Chicken",
+      "emote": "Emote_Chicken",
+      "entrance": 0,
+      "cycle": 3.6333
+    },
+    {
+      "name": "Chug",
+      "emote": "Emote_Chug",
+      "entrance": 0,
+      "cycle": 1.2
+    },
+    {
+      "name": "Confused",
+      "emote": "Emote_Confused",
+      "entrance": 0,
+      "cycle": 6.9667
+    },
+    {
+      "name": "Cry",
+      "emote": "Emote_Cry",
+      "entrance": 0,
+      "cycle": 8.9667
+    },
+    {
+      "name": "Dab",
+      "emote": "Emote_Dab",
+      "entrance": 0,
+      "cycle": 1.8667
+    },
+    {
+      "name": "Break Dance",
+      "emote": "Emote_Dance_Breakdance",
+      "entrance": 0,
+      "cycle": 8.5667
+    },
+    {
+      "name": "Disco Fever",
+      "emote": "Emote_Dance_Disco_T3",
+      "entrance": 0,
+      "cycle": 8.8
+    },
+    {
+      "name": "Take The L",
+      "emote": "Emote_Dance_Loser",
+      "entrance": 0.8,
+      "cycle": 0.8
+    },
+    {
+      "name": "Boneless",
+      "emote": "Emote_Dance_NoBones",
+      "entrance": 0,
+      "cycle": 3.2
+    },
+    {
+      "name": "Pump",
+      "emote": "Emote_Dance_Pump",
+      "entrance": 0,
+      "cycle": 3.5333
+    },
+    {
+      "name": "Ride The Pony",
+      "emote": "Emote_Dance_RideThePony",
+      "entrance": 0,
+      "cycle": 2.6667
+    },
+    {
+      "name": "Hype",
+      "emote": "Emote_Dance_Shoot",
+      "entrance": 0,
+      "cycle": 3.5333
+    },
+    {
+      "name": "Swipe It",
+      "emote": "Emote_Dance_SwipeIt",
+      "entrance": 0,
+      "cycle": 3.4667
+    },
+    {
+      "name": "The Worm",
+      "emote": "Emote_Dance_Worm",
+      "entrance": 0,
+      "cycle": 4.1667
+    },
+    {
+      "name": "Disco Fever 2",
+      "emote": "Emote_DG_Disco",
+      "entrance": 0,
+      "cycle": 7.3667
+    },
+    {
+      "name": "Dust Off Hands",
+      "emote": "Emote_DustingOffHands",
+      "entrance": 0,
+      "cycle": 3.2667
+    },
+    {
+      "name": "Dust Off Shoulders",
+      "emote": "Emote_DustOffShoulders",
+      "entrance": 0,
+      "cycle": 3.7333
+    },
+    {
+      "name": "Eastern Bloc",
+      "emote": "Emote_EasternBloc_Start",
+      "entrance": 2.9667,
+      "cycle": 11.6333
+    },
+    {
+      "name": "Facepalm",
+      "emote": "Emote_Facepalm",
+      "entrance": 0,
+      "cycle": 5.3
+    },
+    {
+      "name": "Dream Feet",
+      "emote": "Emote_FancyFeet",
+      "entrance": 4.2333,
+      "cycle": 4.2333
+    },
+    {
+      "name": "On the Hook",
+      "emote": "Emote_Fishing",
+      "entrance": 0,
+      "cycle": 7.2667
+    },
+    {
+      "name": "Flex",
+      "emote": "Emote_Flex",
+      "entrance": 0,
+      "cycle": 8.1
+    },
+    {
+      "name": "Flippin",
+      "emote": "Emote_FlippnSexy",
+      "entrance": 0,
+      "cycle": 3.4667
+    },
+    {
+      "name": "Floss",
+      "emote": "Emote_FlossDance",
+      "entrance": 0,
+      "cycle": 1.6
+    },
+    {
+      "name": "Finger Guns",
+      "emote": "Emote_Fonzie_Pistol",
+      "entrance": 0,
+      "cycle": 3.2
+    },
+    {
+      "name": "Fresh",
+      "emote": "Emote_Fresh",
+      "entrance": 0,
+      "cycle": 10.1333
+    },
+    {
+      "name": "Golf Clap",
+      "emote": "Emote_golfclap",
+      "entrance": 0,
+      "cycle": 3.8
+    },
+    {
+      "name": "Groove Jam",
+      "emote": "Emote_GrooveJam",
+      "entrance": 0,
+      "cycle": 9.3333
+    },
+    {
+      "name": "Guitar",
+      "emote": "Emote_guitar",
+      "entrance": 0,
+      "cycle": 10.1333
+    },
+    {
+      "name": "Hand Signals",
+      "emote": "Emote_HandSignals",
+      "entrance": 0,
+      "cycle": 9.6
+    },
+    {
+      "name": "Shuffle",
+      "emote": "Emote_Hillbilly_Shuffle_Intro",
+      "entrance": 0.9667,
+      "cycle": 2.5
+    },
+    {
+      "name": "Hip Hop",
+      "emote": "Emote_Hiphop_01",
+      "entrance": 6.2667,
+      "cycle": 7.2667
+    },
+    {
+      "name": "Hot Stuff",
+      "emote": "Emote_Hotstuff",
+      "entrance": 0,
+      "cycle": 3.3667
+    },
+    {
+      "name": "Hula Hop",
+      "emote": "Emote_Hula_Start",
+      "entrance": 2.0333,
+      "cycle": 7.2
+    },
+    {
+      "name": "Breaking Point",
+      "emote": "Emote_IBreakYou",
+      "entrance": 0,
+      "cycle": 3.5667
+    },
+    {
+      "name": "True Love",
+      "emote": "Emote_IHeartYou",
+      "entrance": 0,
+      "cycle": 2.5
+    },
+    {
+      "name": "Infinite Dab",
+      "emote": "Emote_InfiniDab_Intro",
+      "entrance": 0.7333,
+      "cycle": 1.0667
+    },
+    {
+      "name": "Intensity",
+      "emote": "Emote_Intensity_Start",
+      "entrance": 5.5,
+      "cycle": 5.3333
+    },
+    {
+      "name": "Irish Jig",
+      "emote": "Emote_IrishJig_Start",
+      "entrance": 0.5667,
+      "cycle": 6.3667
+    },
+    {
+      "name": "Eagle",
+      "emote": "Emote_KoreanEagle",
+      "entrance": 0,
+      "cycle": 4.1
+    },
+    {
+      "name": "True Heart",
+      "emote": "Emote_Kpop_02",
+      "entrance": 0,
+      "cycle": 7.6667
+    },
+    {
+      "name": "Laugh",
+      "emote": "Emote_Laugh",
+      "entrance": 9.0667,
+      "cycle": 9.0667
+    },
+    {
+      "name": "Living Large",
+      "emote": "Emote_LivingLarge",
+      "entrance": 0,
+      "cycle": 16.5333
+    },
+    {
+      "name": "Luchador",
+      "emote": "Emote_Luchador",
+      "entrance": 0,
+      "cycle": 6.8
+    },
+    {
+      "name": "Make It Rain",
+      "emote": "Emote_Make_It_Rain",
+      "entrance": 0,
+      "cycle": 5.0
+    },
+    {
+      "name": "Maracas",
+      "emote": "Emote_Maracas",
+      "entrance": 0,
+      "cycle": 8.1333
+    },
+    {
+      "name": "Orange Justice",
+      "emote": "Emote_Mask_Off_Intro",
+      "entrance": 0.5667,
+      "cycle": 6.5
+    },
+    {
+      "name": "Not Today",
+      "emote": "Emote_NotToday",
+      "entrance": 0,
+      "cycle": 3.6333
+    },
+    {
+      "name": "Pop Lock",
+      "emote": "Emote_PopLock",
+      "entrance": 0,
+      "cycle": 8.2333
+    },
+    {
+      "name": "Star Power",
+      "emote": "Emote_PopRock",
+      "entrance": 0,
+      "cycle": 8.0
+    },
+    {
+      "name": "Robot",
+      "emote": "Emote_RobotDance",
+      "entrance": 0,
+      "cycle": 9.8333
+    },
+    {
+      "name": "Rock",
+      "emote": "Emote_RockPaperScissor_Rock",
+      "entrance": 0,
+      "cycle": 3.5
+    },
+    {
+      "name": "Paper",
+      "emote": "Emote_RockPaperScissor_Paper",
+      "entrance": 0,
+      "cycle": 3.5
+    },
+    {
+      "name": "Scissors",
+      "emote": "Emote_RockPaperScissor_Scissor",
+      "entrance": 0,
+      "cycle": 3.5
+    },
+    {
+      "name": "Salt",
+      "emote": "Emote_Salt",
+      "entrance": 0,
+      "cycle": 5.4667
+    },
+    {
+      "name": "Salute",
+      "emote": "Emote_Salute",
+      "entrance": 0,
+      "cycle": 2.6
+    },
+    {
+      "name": "Drive Car",
+      "emote": "Emote_SmoothDrive",
+      "entrance": 0,
+      "cycle": 7.8
+    },
+    {
+      "name": "Snap",
+      "emote": "Emote_Snap",
+      "entrance": 0,
+      "cycle": 1.8667
+    },
+    {
+      "name": "Stage Bow",
+      "emote": "Emote_StageBow",
+      "entrance": 0,
+      "cycle": 4.0
+    },
+    {
+      "name": "Reanimated",
+      "emote": "Emote_TechnoZombie",
+      "entrance": 0,
+      "cycle": 4.8333
+    },
+    {
+      "name": "Thumbs Down",
+      "emote": "Emote_ThumbsDown",
+      "entrance": 0,
+      "cycle": 4.9333
+    },
+    {
+      "name": "Thumbs Up",
+      "emote": "Emote_ThumbsUp",
+      "entrance": 0,
+      "cycle": 4.9333
+    },
+    {
+      "name": "Twist",
+      "emote": "Emote_Twist",
+      "entrance": 0,
+      "cycle": 11.0
+    },
+    {
+      "name": "Warehouse",
+      "emote": "Emote_WarehouseDance_Start",
+      "entrance": 3.9333,
+      "cycle": 8.6667
+    },
+    {
+      "name": "Wave",
+      "emote": "Emote_Wave2",
+      "entrance": 0,
+      "cycle": 1.8333
+    },
+    {
+      "name": "Wiggle",
+      "emote": "Emote_Wiggle",
+      "entrance": 0,
+      "cycle": 3.2
+    },
+    {
+      "name": "Yeet",
+      "emote": "Emote_Yeet",
+      "entrance": 0,
+      "cycle": 1.6667
+    },
+    {
+      "name": "You're Awesome",
+      "emote": "Emote_Youre_Awesome",
+      "entrance": 0,
+      "cycle": 5.6333
+    },
+    {
+      "name": "Rambunctious",
+      "emote": "Emote_Zippy_Dance",
+      "entrance": 0,
+      "cycle": 3.6667
+    },
+    {
+      "name": "Boogie Down",
+      "emote": "Emote_Boogie_Down_Intro",
+      "entrance": 0.6667,
+      "cycle": 2.6
+    },
+    {
+      "name": "Heel Click",
+      "emote": "Emote_HeelClick",
+      "entrance": 0,
+      "cycle": 9.6
+    },
+    {
+      "name": "Respect",
+      "emote": "Emote_KungFu_Salute",
+      "entrance": 0,
+      "cycle": 2.4667
+    },
+    {
+      "name": "T-Rex",
+      "emote": "Emote_TRex",
+      "entrance": 0,
+      "cycle": 12.6667
+    },
+    {
+      "name": "Smooth Moves",
+      "emote": "Emote_Smooth_Moves",
+      "entrance": 0,
+      "cycle": 9.6
+    },
+    {
+      "name": "California Gurls",
+      "emote": "Emote_Friday13",
+      "entrance": 0,
+      "cycle": 10.2667
+    },
+    {
+      "name": "Gangnam Style",
+      "emote": "Emote_Gangnam_Style",
+      "entrance": 0,
+      "cycle": 7.2667
+    },
+    {
+      "name": "In Da Party",
+      "emote": "Emote_InDaGhetto",
+      "entrance": 0,
+      "cycle": 7.5667
+    },
+    {
+      "name": "Blinding Lights",
+      "emote": "Emote_BlindingLights",
+      "entrance": 0,
+      "cycle": 14.0667
+    },
+    {
+      "name": "Get Griddy",
+      "emote": "Griddy",
+      "entrance": 0,
+      "cycle": 6.0335
+    },
+    {
+      "name": "I Like To Move It",
+      "emote": "Emote_ILikeToMoveIt",
+      "entrance": 0,
+      "cycle": 7.3333
+    },
+    {
+      "name": "The Macarena",
+      "emote": "Emote_Macarena",
+      "entrance": 0,
+      "cycle": 9.3
+    },
+    {
+      "name": "Never Gonna",
+      "emote": "Emote_NeverGonna",
+      "entrance": 0,
+      "cycle": 10.0
+    },
+    {
+      "name": "Ninja Style",
+      "emote": "Emote_NinjaStyle",
+      "entrance": 0,
+      "cycle": 7.4667
+    },
+    {
+      "name": "Pump It Up",
+      "emote": "Emote_PumpkinDance",
+      "entrance": 0,
+      "cycle": 12.0
+    },
+    {
+      "name": "Pump up the Jam",
+      "emote": "Emote_PumpUpTheJam",
+      "entrance": 0,
+      "cycle": 7.6333
+    },
+    {
+      "name": "The Renegade",
+      "emote": "Emote_Renegade",
+      "entrance": 0,
+      "cycle": 12.9
+    },
+    {
+      "name": "Rushin' Around",
+      "emote": "Emote_RushinAround",
+      "entrance": 0,
+      "cycle": 7.5333
+    },
+    {
+      "name": "Say So",
+      "emote": "Emote_SaySo",
+      "entrance": 0,
+      "cycle": 8.6
+    },
+    {
+      "name": "Stuck",
+      "emote": "Emote_Stuck",
+      "entrance": 0,
+      "cycle": 11.4667
+    },
+    {
+      "name": "Toosie Slide",
+      "emote": "Emote_ToosieSlide",
+      "entrance": 0,
+      "cycle": 5.8667
+    },
+    {
+      "name": "Air Shredder",
+      "emote": "Emote_AirShredder",
+      "entrance": 0,
+      "cycle": 5.3333
+    },
+    {
+      "name": "Crossbounce",
+      "emote": "Emote_Crossbounce",
+      "entrance": 0,
+      "cycle": 7.5
+    },
+    {
+      "name": "Distraction Dance",
+      "emote": "Emote_DistractionDance",
+      "entrance": 0,
+      "cycle": 5.5
+    },
+    {
+      "name": "Head Banger",
+      "emote": "Emote_Headbanger",
+      "entrance": 0,
+      "cycle": 3.0667
+    },
+    {
+      "name": "Hitchhiker",
+      "emote": "Emote_HitchHiker",
+      "entrance": 0,
+      "cycle": 4.0
+    },
+    {
+      "name": "It's Go Time!",
+      "emote": "Emote_ItsGoTime",
+      "entrance": 0,
+      "cycle": 6.1667
+    },
+    {
+      "name": "Knee Slapper",
+      "emote": "Emote_KneeSlapper",
+      "entrance": 0,
+      "cycle": 10.4
+    },
+    {
+      "name": "Showstopper",
+      "emote": "Emote_Showstopper",
+      "entrance": 0,
+      "cycle": 7.4
+    },
+    {
+      "name": "Sprinkler",
+      "emote": "Emote_Sprinkler",
+      "entrance": 0,
+      "cycle": 3.7333
+    },
+    {
+      "name": "Ghostbusters",
+      "emote": "Emote_Ghostbusters",
+      "entrance": 0,
+      "cycle": 8.3333
+    },
+    {
+      "name": "Marsh Walk",
+      "emote": "MarshWalk",
+      "entrance": 0,
+      "cycle": 10.0334
+    },
+    {
+      "name": "Forget me not",
+      "emote": "Emote_RememberMe_Intro",
+      "entrance": 1.4667,
+      "cycle": 10.0
+    },
+    {
+      "name": "Rollie",
+      "emote": "Emote_Rollie",
+      "entrance": 0,
+      "cycle": 13.2667
+    },
+    {
+      "name": "Scenario",
+      "emote": "Scenario",
+      "entrance": 0,
+      "cycle": 8.1001
+    },
+    {
+      "name": "John Cena",
+      "emote": "Emote_Cena",
+      "entrance": 0,
+      "cycle": 7.2333
+    },
+    {
+      "name": "The Silencer",
+      "emote": "Emote_Lebron",
+      "entrance": 0,
+      "cycle": 6.6667
+    },
+    {
+      "name": "Walky Walk",
+      "emote": "Emote_Walkywalk_Walk",
+      "entrance": 0,
+      "cycle": 11.8
+    },
+    {
+      "name": "Popular Vibe",
+      "emote": "PopularVibe",
+      "entrance": 0,
+      "cycle": 4.8336
+    },
+    {
+      "name": "Jabba Switchway",
+      "emote": "JabbaSwitchway",
+      "entrance": 0,
+      "cycle": 10.1334
+    },
+    {
+      "name": "Go Mufasa",
+      "emote": "GoMufasa",
+      "entrance": 0,
+      "cycle": 7.5335
+    },
+    {
+      "name": "Springy",
+      "emote": "Springy",
+      "entrance": 0,
+      "cycle": 11.9334
+    },
+    {
+      "name": "Shimmer",
+      "emote": "Shimmer",
+      "entrance": 0,
+      "cycle": 7.6335
+    },
+    {
+      "name": "Snoop's Walk",
+      "emote": "SnoopsWalk",
+      "entrance": 0,
+      "cycle": 11.0668
+    },
+    {
+      "name": "Around the World",
+      "emote": "AroundTheWorld",
+      "entrance": 0,
+      "cycle": 8.4001
+    },
+    {
+      "name": "Starlit",
+      "emote": "Starlit",
+      "entrance": 0,
+      "cycle": 12.6001
+    },
+    {
+      "name": "The Fazbear Band",
+      "emote": "FazbearBand",
+      "entrance": 0,
+      "cycle": 11.6668
+    },
+    {
+      "name": "Surfin' Bird",
+      "emote": "SurfinBird",
+      "entrance": 0,
+      "cycle": 7.2335
+    },
+    {
+      "name": "Real Slim Shady",
+      "emote": "RealSlimShady",
+      "entrance": 0,
+      "cycle": 9.9001
+    },
+    {
+      "name": "Lucid Dreams",
+      "emote": "LucidDreams",
+      "entrance": 0,
+      "cycle": 12.9668
+    },
+    {
+      "name": "Empty Out Your Pockets",
+      "emote": "EmptyOutYourPockets",
+      "entrance": 0,
+      "cycle": 10.7668
+    },
+    {
+      "name": "Assumptions",
+      "emote": "Assumptions",
+      "entrance": 0.4,
+      "cycle": 2.424999983
+    },
+    {
+      "name": "Get Lucky",
+      "emote": "GetLuckyIntro",
+      "entrance": 17.0334,
+      "cycle": 8.2335
+    },
+    {
+      "name": "Lil' Octane",
+      "emote": "LilOctaneIntro",
+      "entrance": 0.4356,
+      "cycle": 6.7668
+    },
+    {
+      "name": "Black Beatles",
+      "emote": "BlackBeatles",
+      "entrance": 0,
+      "cycle": 13.5001
+    },
+    {
+      "name": "Caffeinated",
+      "emote": "Caffeinated",
+      "entrance": 0,
+      "cycle": 8.1335
+    },
+    {
+      "name": "Miku Live",
+      "emote": "MikuLive",
+      "entrance": 0,
+      "cycle": 8.2335
+    },
+    {
+      "name": "Summer",
+      "emote": "Summer",
+      "entrance": 0,
+      "cycle": 8.4668
+    },
+    {
+      "name": "Bazooka",
+      "emote": "Bazooka",
+      "entrance": 0.4,
+      "cycle": 11.966666667
+    },
+    {
+      "name": "Get Schwifty",
+      "emote": "GetSchwifty",
+      "entrance": 2.366666824,
+      "cycle": 9.066666667
+    },
+    {
+      "name": "Scouse Stepper",
+      "emote": "ScouseStepper",
+      "entrance": 1.0,
+      "cycle": 13.3
+    },
+    {
+      "name": "Doot Doot (6 7)",
+      "emote": "DootDoot67",
+      "entrance": 0,
+      "cycle": 3.577083312
+    },
+    {
+      "name": "FUTW",
+      "emote": "Futw",
+      "entrance": 0.4,
+      "cycle": 13.166666667
+    },
+    {
+      "name": "No Money",
+      "emote": "NoMoney",
+      "entrance": 1.132760798,
+      "cycle": 7.666666722
+    },
+    {
+      "name": "The Largest",
+      "emote": "TheLargest",
+      "entrance": 0.5,
+      "cycle": 7.333333333
+    },
+    {
+      "name": "TiK ToK",
+      "emote": "TikTok",
+      "entrance": 0.566666667,
+      "cycle": 7.9
+    },
+    {
+      "name": "Shape Up",
+      "emote": "ShapeUp",
+      "entrance": 0.866666696,
+      "cycle": 10.0
+    },
+    {
+      "name": "In The End",
+      "emote": "InTheEnd",
+      "entrance": 1.628740719,
+      "cycle": 20.566666667
+    },
+    {
+      "name": "Let's Get It Started",
+      "emote": "LetsGetItStarted",
+      "entrance": 0.633333302,
+      "cycle": 9.133375042
+    },
+    {
+      "name": "Smitten",
+      "emote": "Smitten",
+      "entrance": 0.533333351,
+      "cycle": 6.3
+    },
+    {
+      "name": "Rap Monster",
+      "emote": "RapMonster",
+      "entrance": 1.466666716,
+      "cycle": 23.133374973
+    },
+    {
+      "name": "Deep Explorer",
+      "emote": "DeepExplorer",
+      "entrance": 0.435927743,
+      "cycle": 12.796666468
+    },
+    {
+      "name": "Shimmy Wiggle",
+      "emote": "ShimmyWiggle",
+      "entrance": 4.042350065,
+      "cycle": 3.609020868
+    },
+    {
+      "name": "Rebellious",
+      "emote": "Rebellious",
+      "entrance": 0.9,
+      "cycle": 9.6
+    },
+    {
+      "name": "Reaper's Showtime",
+      "emote": "ReapersShowtime",
+      "entrance": 0.6,
+      "cycle": 9.233343798
+    },
+    {
+      "name": "Social Climber",
+      "emote": "SocialClimber",
+      "entrance": 0.633333291,
+      "cycle": 7.39998446
+    },
+    {
+      "name": "The Squabble",
+      "emote": "TheSquabble",
+      "entrance": 0.588269225,
+      "cycle": 4.705885494
+    },
+    {
+      "name": "Bring it around",
+      "emote": "BringItAround",
+      "entrance": 0,
+      "cycle": 2.833329398
+    },
+    {
+      "name": "Build Up",
+      "emote": "BuildUp",
+      "entrance": 2.2,
+      "cycle": 9.316666585
+    },
+    {
+      "name": "Chicken Wing It",
+      "emote": "ChickenWingItIntro",
+      "entrance": 3.483333292,
+      "cycle": 6.966666667
+    },
+    {
+      "name": "Socks",
+      "emote": "Socks",
+      "entrance": 1.799631795,
+      "cycle": 7.400041779
+    },
+    {
+      "name": "Chugga-Chugga",
+      "emote": "ChuggaChugga",
+      "entrance": 0,
+      "cycle": 4.833333406
+    },
+    {
+      "name": "Sweet Step",
+      "emote": "SweetStep",
+      "entrance": 0.466666542,
+      "cycle": 12.1
+    },
+    {
+      "name": "Beautiful Things",
+      "emote": "BeautifulThings",
+      "entrance": 1.700016887,
+      "cycle": 6.866666667
+    },
+    {
+      "name": "Havana",
+      "emote": "Havana",
+      "entrance": 0.6,
+      "cycle": 9.330927225
+    },
+    {
+      "name": "Big Dawgs",
+      "emote": "BigDawgs",
+      "entrance": 5.333333511,
+      "cycle": 5.333333333
+    },
+    {
+      "name": "TV Off",
+      "emote": "TvOff",
+      "entrance": 0.733333358,
+      "cycle": 9.533333333
+    },
+    {
+      "name": "Lil' Supercar",
+      "emote": "LilSupercar",
+      "entrance": 0.8,
+      "cycle": 11.966645924
+    },
+    {
+      "name": "Scootin' Circles",
+      "emote": "ScootinCircles",
+      "entrance": 0.714644329,
+      "cycle": 5.277083333
+    },
+    {
+      "name": "Jump Rope Jig",
+      "emote": "JumpRopeJig",
+      "entrance": 0.732999989,
+      "cycle": 9.566708441
+    },
+    {
+      "name": "Lil' Diplodoculus",
+      "emote": "LilDiplodoculus",
+      "entrance": 0.5,
+      "cycle": 7.741937465
+    },
+    {
+      "name": "Sunny Stroll",
+      "emote": "SunnyStroll",
+      "entrance": 0.8,
+      "cycle": 13.0667124
+    }
+  ],
+  "synced": {
+    "InTheEnd": 3,
+    "GetSchwifty": 1,
+    "Bazooka": 1,
+    "ChuggaChugga": 32,
+    "LilSupercar": 3
+  },
+  "interaction": {
+    "text": "Emote Together",
+    "source": "Fortnite_locchunk10.locres",
+    "namespace": "FortPlayerPawn",
+    "key": "GroupEmote"
+  }
+}
