@@ -120,17 +120,11 @@ UptimeRobot monitors the HTTP health endpoint. **Render hosts the server; Uptime
 
 Render's free service can sleep after 15 minutes without incoming HTTP requests or WebSocket messages; waking can take about a minute. This client sends application pings while connected, so active sessions provide inbound traffic. Five-minute health checks also provide traffic while idle, but monitoring cannot guarantee continuous availability or bypass Render's quotas/restarts. Render currently provides 750 free instance hours per workspace per month. Use a paid instance if interruptions are unacceptable.
 
-## 6. Updating the pack and server
+## 6. Updating your relay
 
-Upload the supplied updated **Emotes.zip** to the existing CS2 emote-pack release. It contains the new joined car resources and the full restored music. The DLL's existing updater installs that pack; the relay does not distribute assets.
+When a new relay release is provided, update your server repository with its files, including `catalog.json`, and redeploy. Use the relay release matching your clients' DLL version. The catalog separates incompatible versions into different rooms.
 
-When exporting more emotes, run:
-
-```powershell
-py tools/generate_relay_catalog.py
-```
-
-Then rebuild the DLL and deploy the corresponding `relay/catalog.json`. The catalog fingerprint separates clients with different animation tables so they do not apply an incompatible sequence index. Wire IDs use stable sequence names, never a menu row index. The server checks emote names against the generated catalog. The Supercar prop publishing path rebuilds its joined color variants automatically.
+Hosting a relay does not require uploading an emote ZIP or maintaining an emote-pack release. Players' DLLs download assets through the existing pack updater; the relay only sends emote state.
 
 ## How synchronization works
 
