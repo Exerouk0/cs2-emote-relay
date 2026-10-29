@@ -3,6 +3,11 @@ import assert from 'node:assert/strict';
 import {once} from 'node:events';
 import {WebSocket} from 'ws';
 import {createRelay} from './server.js';
+import catalog from './catalog.json' with {type:'json'};
+
+test('removed Chugga emote is absent from the published catalog',()=> {
+  assert.equal(catalog.emotes.some(emote=>emote.emote==='ChuggaChugga'),false);
+});
 
 const ids=['76561198000000001','76561198000000002','76561198000000003','76561198000000004'];
 async function fixture(t,options={}) {
@@ -23,28 +28,25 @@ async function wait(predicate) {const end=Date.now()+2000;while(Date.now()<end){
 test('state changes reach the same room; other rooms and catalogs remain isolated',async t=> {
   const f=await fixture(t),a=await f.client(ids[0]),b=await f.client(ids[1]);
   const other=await f.client(ids[2],'match:other'),old=await f.client(ids[3],'match:test','old-catalog');
-  a.send({t:'start',id:ids[1],emote:'ChuggaChugga',start:Date.now()});
+  a.send({t:'start',id:ids[1],emote:'LilSupercar',start:Date.now()});
   const event=await wait(()=>b.messages.find(m=>m.t==='state'));
-  assert.equal(event.id,ids[0]);assert.equal(event.emote,'ChuggaChugga');
+  assert.equal(event.id,ids[0]);assert.equal(event.emote,'LilSupercar');
   assert.equal(other.messages.some(m=>m.t==='state'),false);assert.equal(old.messages.some(m=>m.t==='state'),false);
 });
-test('late join gets the original timestamp; seats are assigned by server and stops disband the group',async t=> {
+test('late join gets the original timestamp; stop clears only the sender state',async t=> {
   const f=await fixture(t),a=await f.client(ids[0]);const start=Date.now()-5000;
-  a.send({t:'start',emote:'ChuggaChugga',start});await wait(()=>a.messages.find(m=>m.emote));
+  a.send({t:'start',emote:'LilSupercar',start});await wait(()=>a.messages.find(m=>m.emote));
   const b=await f.client(ids[1]),c=await f.client(ids[2]);
   assert.equal(b.messages.find(m=>m.emote)?.start,start);
-  b.send({t:'join',leader:ids[0],role:99});c.send({t:'join',leader:ids[0]});
-  const one=await wait(()=>b.messages.find(m=>m.id===ids[1] && m.leader));
-  const two=await wait(()=>b.messages.find(m=>m.id===ids[2] && m.leader));
-  assert.equal(one.role,1);assert.equal(two.role,2);assert.equal(one.start,start);
+  assert.equal(c.messages.find(m=>m.id===ids[0] && m.emote)?.start,start);
   a.send({t:'stop'});
-  await wait(()=>b.messages.find(m=>m.id===ids[1] && m.rev>one.rev && !m.emote));
+  await wait(()=>b.messages.find(m=>m.id===ids[0] && !m.emote));
+  assert.equal([...f.rooms.values()][0].get(ids[1]).state,null);
   assert.equal([...f.rooms.values()][0].get(ids[2]).state,null);
 });
-test('disconnect removes player and follower state, empty rooms are reclaimed',async t=> {
+test('disconnect removes player and empty rooms are reclaimed',async t=> {
   const f=await fixture(t),a=await f.client(ids[0]),b=await f.client(ids[1]);
   a.send({t:'start',emote:'LilSupercar',start:Date.now()});await wait(()=>b.messages.find(m=>m.emote));
-  b.send({t:'join',leader:ids[0]});await wait(()=>b.messages.find(m=>m.leader));
   a.ws.close();await wait(()=>b.messages.find(m=>m.t==='remove'));
   assert.equal([...f.rooms.values()][0].get(ids[1]).state,null);
   b.ws.close();await wait(()=>f.rooms.size===0);
@@ -55,6 +57,21 @@ test('clock echo supplies epoch time; malformed and oversized packets are reject
   assert.equal(pong.client,123);assert.ok(Math.abs(Date.now()-pong.server)<1000);
   a.send({t:'start',emote:'bad/path',start:Date.now()});const [code]=await once(a.ws,'close');assert.equal(code,1008);
   const b=await f.client(ids[1]);b.ws.send('x'.repeat(5000));assert.equal((await once(b.ws,'close'))[0],1009);
+});
+test('every current emote and a future pack entry relay without a server allowlist',async t=> {
+  const f=await fixture(t),a=await f.client(ids[0]),b=await f.client(ids[1]),observer=await f.client(ids[2]);
+  const names=catalog.emotes.map(row=>row.emote).concat('FuturePackEmote_2027');
+  // Distribute publishers to stay below each connection's normal burst limit.
+  for(let index=0;index<names.length;index++) {
+    if(index && index%50===0)await new Promise(resolve=>setTimeout(resolve,2600));
+    const publisher=index%2?a:b;
+    const emote=names[index];
+    publisher.send({t:'start',emote,start:Date.now()});
+    const event=await wait(()=>observer.messages.find(message=>message.t==='state' && message.emote===emote));
+    assert.equal(event.emote,emote);
+  }
+  const late=await f.client(ids[3]);
+  assert.ok(late.messages.some(message=>message.emote==='FuturePackEmote_2027'));
 });
 test('shared access token is checked before rooms are joined',async t=> {
   const f=await fixture(t,{token:'correct-token'});

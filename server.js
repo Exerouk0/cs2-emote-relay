@@ -4,7 +4,6 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { pathToFileURL } from 'node:url';
 import { readFileSync } from 'node:fs';
 const catalog=JSON.parse(readFileSync(new URL('./catalog.json',import.meta.url),'utf8'));
-const emotes=new Set(catalog.emotes.map(e=>e.emote));
 
 const idOK = x => typeof x === 'string' && /^[0-9]{15,20}$/.test(x);
 const keyOK = x => typeof x === 'string' && /^[A-Za-z0-9_.:-]{1,96}$/.test(x);
@@ -37,8 +36,6 @@ export function createRelay(options={}) {
     if(!peer.room || peer.room.get(peer.id)!==peer)return;
     const room=peer.room;room.delete(peer.id);
     broadcast(room,{t:'remove',epoch,rev:++revision,id:peer.id});
-    // A leader stopping/disconnecting disbands its followers; no dangling seats.
-    for(const p of room.values())if(p.state?.leader===peer.id){p.state=null;publish(p);}
     if(!room.size)rooms.delete(peer.roomKey);
     peer.room=null;
   }
@@ -80,24 +77,14 @@ export function createRelay(options={}) {
         }
         if(!peer.room)return ws.close(1008,'hello required');
         if(m.t==='stop') {
-          peer.state=null;publish(peer);
-          for(const p of peer.room.values())if(p.state?.leader===peer.id){p.state=null;publish(p);}return;
+          peer.state=null;publish(peer);return;
         }
         if(m.t==='start') {
-          if(!emoteOK(m.emote) || (!emotes.has(m.emote) && !/^Native_(?:[0-9]|1[0-8])$/.test(m.emote)) || !Number.isSafeInteger(m.start) || m.start>now+1000 || m.start<now-86400000)throw Error();
-          for(const p of peer.room.values())if(p.state?.leader===peer.id){p.state=null;publish(p);}
+          // The relay carries identifiers, not assets. New pack entries must not
+          // require a server redeploy; clients resolve identifiers in their pack.
+          if(!emoteOK(m.emote) || !Number.isSafeInteger(m.start) || m.start>now+1000 || m.start<now-86400000)throw Error();
           // The connection can only change its own state. IDs are never taken from event bodies.
-          peer.state={emote:m.emote,start:m.start,leader:'',role:0};publish(peer);return;
-        }
-        if(m.t==='join') {
-          if(!idOK(m.leader) || m.leader===peer.id)throw Error();
-          const leader=peer.room.get(m.leader);
-          if(!leader?.state || leader.state.leader)return send(ws,{t:'error',reason:'leader unavailable'});
-          const max=catalog.synced[leader.state.emote]||0;
-          const occupied=new Set([...peer.room.values()].filter(p=>p!==peer && p.state?.leader===leader.id).map(p=>p.state.role));
-          let role=1;while(occupied.has(role))++role;
-          if(role>max)return send(ws,{t:'error',reason:'no seats available'});
-          peer.state={...leader.state,leader:leader.id,role};publish(peer);return;
+          peer.state={emote:m.emote,start:m.start};publish(peer);return;
         }
         throw Error();
       } catch {ws.close(1008,'invalid packet');}

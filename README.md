@@ -1,6 +1,8 @@
 # CS2 emote relay: setup from scratch
 
-This is a small Node.js WebSocket relay. CS2 still runs movement, collision and hit registration. This server sends emote names, start times and group seats. It never receives meshes, frame poses or game physics.
+This is a small Node.js WebSocket relay. CS2 still runs movement, collision and hit registration. This server sends emote identifiers and start times. It never receives meshes, frame poses or game physics.
+
+The relay accepts valid emote identifiers from new packs without a bundled allowlist. New emotes do not require another server deployment. Clients still use their catalog fingerprint to share a room only with compatible DLLs; each client renders identifiers supported by its installed pack. `catalog.json` describes the bundled pack for diagnostics.
 
 ## 1. Put the server on GitHub
 
@@ -40,13 +42,13 @@ The server listens on Render's `PORT` automatically. You do not open a separate 
 
 ## 3. Point the DLL at the shared relay
 
-The DLL automatically connects to `wss://cs2-emote-relay.onrender.com/v1` with sharing ON by default. New configs receive these defaults. On injection, older configs automatically gain the missing sharing and join-key settings; missing or blank relay URL and default-server access-code fields are populated too. Existing OFF settings, custom addresses, room codes and key bindings are preserved. No config deletion, pack redownload or manual config editing is needed to use the default server with this DLL.
+The DLL automatically connects to `wss://cs2-emote-relay.onrender.com/v1` with sharing ON by default. New configs receive these defaults. On injection, older configs automatically gain missing sharing settings; missing or blank relay URL and default-server access-code fields are populated too. Existing OFF settings, custom addresses, room codes and key bindings are preserved. No config deletion, pack redownload or manual config editing is needed to use the default server with this DLL.
 
 The server's `RELAY_TOKEN` must match the DLL's distributed access code. This is a shared code visible in the DLL and config, not a private server secret. Hosting account passwords and API keys must never be put into the DLL or config.
 
 The following manual steps are only for connecting to a different, self-hosted relay:
 
-For automatic sharing in a match, every client must use the same relay URL and compatible emote catalog. The DLL automatically groups clients by the CS2 match ID and broadcasts active emotes; players do not need to enter a room code for a normal match. The **join key is only for taking a Fortnite group-emote role** (such as joining the Chugga-Chugga wagon). It is not needed to see another player's ordinary emote.
+For automatic sharing in a match, every client must use the same relay URL and compatible emote catalog. The DLL automatically groups clients by the human Steam IDs visible in the CS2 server and broadcasts active emotes; players do not need to enter a room code for a normal match. Each participant performs the emote on their own existing character model.
 
 1. Close CS2 before editing the config.
 2. Open **Documents → Emotes → emotes.ini**.
@@ -67,7 +69,8 @@ Sharing defaults to ON even when older configs lack `multiplayer`.
    | Status | Meaning |
    |---|---|
    | SET SERVER URL | `relay_url` is empty |
-   | WAITING FOR MATCH / ROOM | No usable Steam ID or room yet |
+   | WAITING FOR STEAM | The local Steam identity is unavailable |
+   | FINDING LOBBY / SESSION | Looking for a joined Steam lobby or game roster |
    | CONNECTING | Opening the WebSocket |
    | CONNECTED | Joined the relay room |
    | RECONNECTING | Retrying after a connection failure |
@@ -76,36 +79,17 @@ Sharing defaults to ON even when older configs lack `multiplayer`.
 6. Give each participant the same DLL version, emote pack, server URL and token.
 7. Join the same match and start a Fortnite emote. Other connected participants render it on your existing CS2 pawn. Players without this DLL see ordinary CS2 behavior.
 
-The DLL derives an automatic room from `C_CSGameRules.m_ullLocalMatchID`. Some local/community sessions expose zero or lack this field. For those matches, put the same unique room code in everyone's `relay_room`. Use a different code for a different session.
+In games, including private practice and community servers, the DLL builds a deterministic room from the sorted human player roster. It does not require a Valve matchmaking ID. Bots are ignored. When a player joins or leaves, clients converge to the new roster room and retain their original emote start timestamp. Allow a few seconds for roster replication and reconnection after a session change.
 
 ### Lobby / main menu
 
-The main menu has no CS2 match ID to group by. For menu sharing, set the same `relay_room=friends-friday` (or another unique code) on every participant's client. A nonempty room is an explicit override in menus **and in matches**; clear it when you want automatic match grouping again. Automatic menu grouping would require a stable lobby identifier supplied by the game or a separate friend/lobby discovery service.
+Join the same CS2 party/lobby and keep `relay_room=` blank. The DLL reads the current matchmaking session and Steam lobby information, then verifies that your own Steam ID is an actual lobby member before choosing that room. Friend presence can supply lobby candidates, but simply having a friend playing CS2 does not put you in their room. Both clients need sharing ON and the same relay/catalog.
 
-The main menu lacks the remote in-match pawn entities. The DLL therefore draws up to seven remote Fortnite emote previews beside your local preview, using your available local agent model as the stand-in. It does not download another player's loadout. Native CS2 pose clips are shared in matches; lobby stand-ins use the Fortnite catalog.
+`relay_room` remains an optional manual override for custom sessions; it applies in menus and matches. Leave it blank for automatic discovery.
 
-## 4. Join an emote
+The DLL maps Steam IDs using the same ordered PartyListAPI collection as CS2's main-menu script, then replaces each dancing member's actual `dynamic_player` preview in its existing position using that preview's agent model. It hides the original while the replacement dances and restores it afterward. Unmapped or unloaded slots are skipped instead of inventing a position or copying your own agent. The built-in CS2 clip tab has been removed; the Fortnite Dances and Emotes tabs remain.
 
-1. Keep SHARE EMOTES on and verify CONNECTED on both clients.
-2. Have one player start one of these emotes:
-
-   | Emote | Joining behavior |
-   |---|---|
-   | Chugga-Chugga | A passenger with the exported wagon animation follows the leader's recorded path. Up to 32 wagon seats. |
-   | Lil' Supercar | Up to three joining drivers use blue, purple and gold vehicles. The leader keeps red. |
-   | Get Schwifty | One joining player takes the exported partner role. |
-   | In The End | Up to three joining players take the exported instrument roles. |
-   | Bazooka | One joining player takes the exported partner role. |
-
-3. Approach within 220 CS2 units of a leader. Press E when **[E] Emote Together** appears.
-4. The relay assigns a free seat and the leader's original start timestamp. A real participant replaces the corresponding decorative copy.
-5. Use your existing Stop Emoting key (F6 by default) to leave. When the leader stops, switches emotes or disconnects, its group is disbanded.
-
-The wording is from the installed English Fortnite localization: `Fortnite_locchunk10.locres`, namespace `FortPlayerPawn`, key `GroupEmote`, value `Emote Together`. The five supported group emotes were confirmed from their exported item definitions. This is not a claim that every Fortnite group emote has already been ported.
-
-Group placement is a local visual effect. It does not teleport CS2's real pawn, alter hitboxes, or let the relay drive movement. To physically travel together, players still use CS2 movement.
-
-## 5. Set up UptimeRobot
+## 4. Set up UptimeRobot
 
 UptimeRobot monitors the HTTP health endpoint. **Render hosts the server; UptimeRobot does not.**
 
@@ -128,12 +112,12 @@ Hosting a relay does not require uploading an emote ZIP or maintaining an emote-
 
 ## How synchronization works
 
-* The client samples only local CS2 entities. It sends `hello`, `start`, `stop`, `join` and occasional clock pings.
+* The client samples only local CS2 entities. It sends `hello`, `start`, `stop` and occasional clock pings.
 * The relay owns room membership and seats. It attaches the connection's identity to each change; an event body cannot target a different player.
 * A start carries its absolute server-clock time. Clock pings estimate the offset from Windows' monotonic clock using the lowest round-trip sample. Animation phase and WAV seeking use elapsed time from that start. Songs play to completion and loop without being cut by a short body animation.
 * New connections receive a reset, active state records and a snapshot-end marker. Late joiners immediately seek to the current animation and audio phase.
 * Reconnects use bounded backoff and reannounce the original local start. State carries a server epoch and increasing revision; disconnects remove peers and reclaim empty rooms.
-* Only one nearby remote song is selected at a time, with your own emote taking priority. This limits audio work and avoids stacking multiple copies of the same group music.
+* The nearest audible remote song uses continuous distance attenuation and equal-power headphone panning from the rendered camera's right axis. Your own song retains its original stereo channels and takes priority. Mono source WAVs are expanded to stereo output before positioning. Live gains ramp across audio blocks to avoid clicks; volume never changes CS2's process-wide sound level.
 * HTTP/WebSocket work runs off the game/render thread. Packet payloads are capped at 4 KB, room size at 64, pending output at 64 KB per client, and event rate at a 40-message burst / 10 messages per second. There are no animation-frame packets, physics updates or databases.
 
 The server is intentionally one instance with in-memory state. Do not scale it to multiple independent Render instances: clients in the same room could be split. Add Redis pub/sub and shared seat ownership before horizontal scaling.
@@ -157,9 +141,7 @@ Local URL: `ws://127.0.0.1:10000/v1`; health: `http://127.0.0.1:10000/healthz`. 
 
 * **Health URL does not load:** check Render's deploy log, build/start commands and Root Directory. Wait for a free service to wake.
 * **Health works but CONNECTED never appears:** the DLL URL needs `/v1`; UptimeRobot uses `/healthz`. Check the token and allow outbound HTTPS.
-* **Both connected but no remote emotes:** verify the same match/room, matching DLL/catalog and pack. In a local game, set the same `relay_room` explicitly. Steam ID zero/bots cannot advertise as human Steam users.
-* **Emote Together does not appear:** the leader must be performing one of the five supported group emotes, not already following someone else; approach closer and close the wheel.
-* **A joined vehicle does not appear:** ensure the new pack contains `lil_supercar_join1.vmdl_c`, `lil_supercar_join2.vmdl_c` and `lil_supercar_join3.vmdl_c` and their compiled material/texture dependencies.
+* **Both connected but no remote emotes:** verify the same match/room, matching DLL/catalog and pack. Leave `relay_room` blank for automatic discovery, or make sure any manual override matches. Look for `relay-session` lines in `Documents/Emotes/emotes.log` to compare the detected mode, Steam ID, human count, lobby and room. Steam ID zero/bots cannot advertise as human Steam users.
 * **Server restarts:** clients reconnect and republish active state automatically. RAM-only state is expected to reset on deployment.
 
 ## Sources checked

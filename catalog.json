@@ -1,6 +1,6 @@
 {
   "protocol": 1,
-  "id": "fnemotes-32c2f681f839aa64df9d",
+  "id": "fnemotes-9e3e86aaef68f216cda9",
   "emotes": [
     {
       "name": "Dance Moves",
@@ -484,15 +484,15 @@
     },
     {
       "name": "Boogie Down",
-      "emote": "Emote_Boogie_Down_Intro",
-      "entrance": 0.6667,
-      "cycle": 2.6
+      "emote": "BoogieDownIntro",
+      "entrance": 0.7,
+      "cycle": 4.4
     },
     {
       "name": "Heel Click",
       "emote": "Emote_HeelClick",
       "entrance": 0,
-      "cycle": 9.6
+      "cycle": 1.833333
     },
     {
       "name": "Respect",
@@ -969,12 +969,6 @@
       "cycle": 7.400041779
     },
     {
-      "name": "Chugga-Chugga",
-      "emote": "ChuggaChugga",
-      "entrance": 0,
-      "cycle": 4.833333406
-    },
-    {
       "name": "Sweet Step",
       "emote": "SweetStep",
       "entrance": 0.466666542,
@@ -1033,19 +1027,336 @@
       "emote": "SunnyStroll",
       "entrance": 0.8,
       "cycle": 13.0667124
+    },
+    {
+      "name": "Royal Ride",
+      "emote": "RoyalRide",
+      "entrance": 1.4667,
+      "cycle": 6.0
+    },
+    {
+      "name": "Lil' Big Jellyfish",
+      "emote": "LilBigJellyfish",
+      "entrance": 1.7,
+      "cycle": 10.2
+    },
+    {
+      "name": "Lil' Street Sweeper",
+      "emote": "LilStreetSweeper",
+      "entrance": 1.7675,
+      "cycle": 6.9992
+    },
+    {
+      "name": "Scooby Gang Run",
+      "emote": "ScoobyGangRun",
+      "entrance": 1.2333,
+      "cycle": 6.0333
+    },
+    {
+      "name": "Lil' Prized Piggy Bank",
+      "emote": "LilPrizedPiggyBank",
+      "entrance": 0.8,
+      "cycle": 9.0
+    },
+    {
+      "name": "Jake Car",
+      "emote": "JakeCar",
+      "entrance": 1.6,
+      "cycle": 8.4
+    },
+    {
+      "name": "Metal Detectin'",
+      "emote": "MetalDetectin",
+      "entrance": 0.6,
+      "cycle": 10.8667
+    },
+    {
+      "name": "Sparrow Run",
+      "emote": "SparrowRun",
+      "entrance": 0,
+      "cycle": 4.1333
+    },
+    {
+      "name": "Jubi Slide",
+      "emote": "JubiSlide",
+      "entrance": 0,
+      "cycle": 6.9212
+    },
+    {
+      "name": "Pitcycle",
+      "emote": "Pitcycle",
+      "entrance": 1.57,
+      "cycle": 6.8967
+    },
+    {
+      "name": "Wind Up",
+      "emote": "WindUp",
+      "entrance": 0,
+      "cycle": 4.6667
+    },
+    {
+      "name": "Fishy Flourish",
+      "emote": "FishyFlourish",
+      "entrance": 0,
+      "cycle": 9.3391
+    },
+    {
+      "name": "Shanty for a Squad",
+      "emote": "ShantyForASquad",
+      "entrance": 0.6,
+      "cycle": 10.1
+    },
+    {
+      "name": "Fancy Footwork",
+      "emote": "FancyFootwork",
+      "entrance": 0,
+      "cycle": 4.1
+    },
+    {
+      "name": "Lil' Saucer",
+      "emote": "LilSaucer",
+      "entrance": 0,
+      "cycle": 5.9667
+    },
+    {
+      "name": "Leapin'",
+      "emote": "Leapin",
+      "entrance": 0,
+      "cycle": 5.0
+    },
+    {
+      "name": "Clean Sweep",
+      "emote": "CleanSweepIntro",
+      "entrance": 10.6667,
+      "cycle": 10.6667
+    },
+    {
+      "name": "Focused",
+      "emote": "Focused",
+      "entrance": 0,
+      "cycle": 2.8
+    },
+    {
+      "name": "Sypher's Strut",
+      "emote": "SypherSStrut",
+      "entrance": 0.9414,
+      "cycle": 9.8919
+    },
+    {
+      "name": "Billy Bounce",
+      "emote": "BillyBounceIntro",
+      "entrance": 11.2333,
+      "cycle": 11.2333
+    },
+    {
+      "name": "Cartwheelin'",
+      "emote": "Cartwheelin",
+      "entrance": 0,
+      "cycle": 1.7351
+    },
+    {
+      "name": "Full Tilt",
+      "emote": "FullTiltIntro",
+      "entrance": 0.8,
+      "cycle": 0.8
+    },
+    {
+      "name": "Cry For Me",
+      "emote": "CryForMe",
+      "entrance": 0.5,
+      "cycle": 15.5
+    },
+    {
+      "name": "Beggin'",
+      "emote": "Beggin",
+      "entrance": 0.8,
+      "cycle": 7.4333
+    },
+    {
+      "name": "Barrier Breaker",
+      "emote": "BarrierBreaker",
+      "entrance": 0.7333,
+      "cycle": 9.9333
+    },
+    {
+      "name": "two",
+      "emote": "Two",
+      "entrance": 0.5667,
+      "cycle": 7.5333
+    },
+    {
+      "name": "Lil' Shady Mobile",
+      "emote": "LilShadyMobile",
+      "entrance": 2.0333,
+      "cycle": 20.2
+    },
+    {
+      "name": "T-Pose",
+      "emote": "TPoseIntro",
+      "entrance": 1.2,
+      "cycle": 12.8
+    },
+    {
+      "name": "Neighborly Hang",
+      "emote": "NeighborlyHang",
+      "entrance": 0,
+      "cycle": 14.9
+    },
+    {
+      "name": "Get Uptempo",
+      "emote": "GetUptempo",
+      "entrance": 9.6333,
+      "cycle": 3.5
+    },
+    {
+      "name": "Lil' Circuit Racer",
+      "emote": "LilCircuitRacer",
+      "entrance": 0.8333,
+      "cycle": 11.6
+    },
+    {
+      "name": "Sandstorm",
+      "emote": "Sandstorm",
+      "entrance": 0.4333,
+      "cycle": 7.0667
+    },
+    {
+      "name": "Moongazer",
+      "emote": "Moongazer",
+      "entrance": 0.7659,
+      "cycle": 11.7341
+    },
+    {
+      "name": "No Tears",
+      "emote": "NoTears",
+      "entrance": 0.5333,
+      "cycle": 6.7
+    },
+    {
+      "name": "Crabby",
+      "emote": "Crabby",
+      "entrance": 0.0011,
+      "cycle": 7.6322
+    },
+    {
+      "name": "Lazer Blast",
+      "emote": "LazerBlast",
+      "entrance": 0,
+      "cycle": 6.2
+    },
+    {
+      "name": "Boing!",
+      "emote": "Boing",
+      "entrance": 0,
+      "cycle": 1.3333
+    },
+    {
+      "name": "Love Me Not",
+      "emote": "LoveMeNot",
+      "entrance": 0.5333,
+      "cycle": 8.4333
+    },
+    {
+      "name": "Fireball",
+      "emote": "Fireball",
+      "entrance": 1.0667,
+      "cycle": 7.8
+    },
+    {
+      "name": "Young Black & Rich",
+      "emote": "YoungBlackRich",
+      "entrance": 0.5667,
+      "cycle": 7.3667
+    },
+    {
+      "name": "Look at Me",
+      "emote": "LookAtMe",
+      "entrance": 0.8667,
+      "cycle": 6.9333
+    },
+    {
+      "name": "Bye Bye Bye",
+      "emote": "ByeByeBye",
+      "entrance": 0.7,
+      "cycle": 11.1
+    },
+    {
+      "name": "Mine",
+      "emote": "Mine",
+      "entrance": 2.7005,
+      "cycle": 7.7662
+    },
+    {
+      "name": "Bouncer",
+      "emote": "Bouncer",
+      "entrance": 0.0011,
+      "cycle": 3.0655
+    },
+    {
+      "name": "Breakneck",
+      "emote": "Breakneck",
+      "entrance": 0,
+      "cycle": 8.2667
+    },
+    {
+      "name": "Raise The Roof",
+      "emote": "RaiseTheRoof",
+      "entrance": 0,
+      "cycle": 4.6667
+    },
+    {
+      "name": "The Rakai Emote",
+      "emote": "TheRakaiEmote",
+      "entrance": 0.4333,
+      "cycle": 13.7
+    },
+    {
+      "name": "Deep Thought",
+      "emote": "DeepThought",
+      "entrance": 1.7333,
+      "cycle": 10.8333
+    },
+    {
+      "name": "Tangled Up (Lokee Remix)",
+      "emote": "TangledUpLokeeRemix",
+      "entrance": 0.5,
+      "cycle": 15.2333
+    },
+    {
+      "name": "The Viper",
+      "emote": "TheViper",
+      "entrance": 0.8333,
+      "cycle": 11.8667
+    },
+    {
+      "name": "Feel It",
+      "emote": "FeelIt",
+      "entrance": 1.367,
+      "cycle": 7.9664
+    },
+    {
+      "name": "GEEK TIM\u00c3\u2039",
+      "emote": "GeekTim",
+      "entrance": 0.4667,
+      "cycle": 12.1667
+    },
+    {
+      "name": "Outlaw",
+      "emote": "Outlaw",
+      "entrance": 0.4002,
+      "cycle": 8.9665
+    },
+    {
+      "name": "Rocket Rodeo",
+      "emote": "RocketRodeo",
+      "entrance": 0,
+      "cycle": 8.6667
+    },
+    {
+      "name": "Pizza Party",
+      "emote": "PizzaPartyIntro",
+      "entrance": 4.8333,
+      "cycle": 6.7
     }
-  ],
-  "synced": {
-    "InTheEnd": 3,
-    "GetSchwifty": 1,
-    "Bazooka": 1,
-    "ChuggaChugga": 32,
-    "LilSupercar": 3
-  },
-  "interaction": {
-    "text": "Emote Together",
-    "source": "Fortnite_locchunk10.locres",
-    "namespace": "FortPlayerPawn",
-    "key": "GroupEmote"
-  }
+  ]
 }
