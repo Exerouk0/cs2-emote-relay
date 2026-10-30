@@ -8,7 +8,7 @@ The relay accepts valid emote identifiers from new packs without a bundled allow
 
 1. Unzip `relay-server.zip` into a new empty folder.
 2. Create a new GitHub repository called `cs2-emote-relay`. **Public is fine** and lets other people inspect and host their own relay. A private repository works too.
-3. Open the repository and choose **Add file → Upload files**.
+3. Open the repository and choose **Add file â†’ Upload files**.
 4. Upload the **contents** of the extracted folder. You should see `server.js`, `package.json`, `package-lock.json`, `catalog.json` and `render.yaml` at the repository's top level. Do not upload `node_modules`.
 5. Commit the upload.
 
@@ -17,7 +17,7 @@ If you instead upload this entire source workspace, the server lives under `rela
 ## 2. Deploy on Render
 
 1. Sign in at [Render](https://dashboard.render.com/).
-2. Choose **New → Web Service**.
+2. Choose **New â†’ Web Service**.
 3. Connect GitHub and select the repository you created.
 4. Set:
 
@@ -51,7 +51,7 @@ The following manual steps are only for connecting to a different, self-hosted r
 For automatic sharing in a match, every client must use the same relay URL and compatible emote catalog. The DLL automatically groups clients by the human Steam IDs visible in the CS2 server and broadcasts active emotes; players do not need to enter a room code for a normal match. Each participant performs the emote on their own existing character model.
 
 1. Close CS2 before editing the config.
-2. Open **Documents → Emotes → emotes.ini**.
+2. Open **Documents â†’ Emotes â†’ emotes.ini**.
 3. Under the existing `[emotes]` section, set these keys. Replace the example hostname and token:
 
 ```ini
@@ -157,9 +157,15 @@ Local URL: `ws://127.0.0.1:10000/v1`; health: `http://127.0.0.1:10000/healthz`. 
 ## Sources checked
 
 * [Epic: traversal, beat-synced and synced emotes](https://www.epicgames.com/help/c-34254770/c-33726977/a10354219)
-* [Epic: Lil' Supercar — Group Emote](https://www.fortnite.com/item-shop/emotes/lil-supercar-48e96744?assetType=Bundle&itemNotAvailable=true&title=Bundle+CCFN+C5S1)
+* [Epic: Lil' Supercar â€” Group Emote](https://www.fortnite.com/item-shop/emotes/lil-supercar-48e96744?assetType=Bundle&itemNotAvailable=true&title=Bundle+CCFN+C5S1)
 * Installed Fortnite item definitions and English localization, inspected with this workspace's extractor.
 * [Render: WebSockets](https://render.com/docs/websocket)
 * [Render: free instances and their limits](https://render.com/docs/free)
 * [UptimeRobot: free monitoring](https://help.uptimerobot.com/en/articles/11604710-who-should-use-uptimerobot-s-free-plan)
 * [Microsoft: WinHTTP concurrency and cancellation](https://learn.microsoft.com/en-us/windows/win32/winhttp/concurrency-in-winhttp)
+
+## Emote joining
+
+Deploy the joining-capable server and client DLL once. The host advertises bounded role/variant counts from its pack catalog. The server reserves a unique role on `join`, publishes an approaching participant, and activates it on `ready`. Participants inherit the host's animation/song epochs. A host switch, stop, disconnect or room change removes dependent participants; a non-traversal participant cancellation stops its group. Vehicle colors are assigned on the server, exclude the red host color, prefer unused non-red variants, and remain in snapshots.
+
+The server remains a signaling relay. It does not move pawns or run terrain/physics. Clients handle proximity prompts, direct approach input, formation rendering and movement cancellation against CS2's native pawn state. Positions and Steam IDs remain client-reported/trusted within the existing relay model. Adding supported participant assets later does not require a server catalog update.

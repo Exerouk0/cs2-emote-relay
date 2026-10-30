@@ -28,13 +28,23 @@ export function createRelay(options={}) {
     ws.send(JSON.stringify(data));
   }
   function broadcast(room,data) {for(const peer of room.values())send(peer.ws,data);}
-  function publish(peer) {
+  function publish(peer,cancelledEmote='') {
     peer.rev=++revision;
-    broadcast(peer.room,{t:'state',epoch,rev:peer.rev,id:peer.id,...peer.state});
+    broadcast(peer.room,{t:'state',epoch,rev:peer.rev,id:peer.id,...peer.state,...(cancelledEmote?{cancelledEmote}:{})});
+  }
+  function stopGroup(peer) {
+    const leader=peer.state?.leader||peer.id;
+    for(const p of peer.room?.values()||[])if(p.id===leader || p.state?.leader===leader) {
+      const emote=p.state?.emote;p.state=null;publish(p,emote);
+    }
+  }
+  function clearFollowers(peer) {
+    for(const p of peer.room?.values()||[])if(p.state?.leader===peer.id) {const emote=p.state.emote;p.state=null;publish(p,emote);}
   }
   function detach(peer) {
     if(!peer.room || peer.room.get(peer.id)!==peer)return;
     const room=peer.room;room.delete(peer.id);
+    clearFollowers({...peer,room});
     broadcast(room,{t:'remove',epoch,rev:++revision,id:peer.id});
     if(!room.size)rooms.delete(peer.roomKey);
     peer.room=null;
@@ -77,7 +87,32 @@ export function createRelay(options={}) {
         }
         if(!peer.room)return ws.close(1008,'hello required');
         if(m.t==='stop') {
-          peer.state=null;publish(peer);return;
+          if(peer.state?.leader && !peer.room.get(peer.state.leader)?.state?.traversal)stopGroup(peer);
+          else {clearFollowers(peer);peer.state=null;publish(peer);}return;
+        }
+        if(m.t==='join') {
+          if(!idOK(m.leader) || m.leader===peer.id)throw Error();
+          const leader=peer.room.get(m.leader);
+          if(!leader?.state || leader.state.leader)return send(ws,{t:'joinRejected',reason:'host unavailable'});
+          const def={...(catalog.emotes.find(d=>d.emote===leader.state.emote)||{}),
+            roles:leader.state.roles||0,variants:leader.state.variants||0,traversal:leader.state.traversal===true};
+          if(!def || (!def.roles && !def.variants))return send(ws,{t:'joinRejected',reason:'not joinable'});
+          const occupied=[...peer.room.values()].filter(p=>p!==peer && p.state?.leader===leader.id);
+          const max=def.roles||63;
+          const used=new Set(occupied.map(p=>p.state.role));
+          let role=1;while(used.has(role))role++;
+          if(role>max)return send(ws,{t:'joinRejected',reason:'full'});
+          clearFollowers(peer);
+          const variants=def.variants||0;
+          const available=Array.from({length:variants},(_,i)=>i+1).filter(n=>!occupied.some(p=>p.state.variant===n));
+          const colors=available.length?available:Array.from({length:variants},(_,i)=>i+1);
+          const variant=colors.length?colors[Math.floor(Math.random()*colors.length)]:0;
+          peer.state={emote:leader.state.emote,start:leader.state.start,musicStart:leader.state.musicStart,
+            leader:leader.id,role,variant,approaching:!def.traversal,duplicates:false};publish(peer);return;
+        }
+        if(m.t==='ready') {
+          if(!peer.state?.leader || !peer.state.approaching)return;
+          peer.state.approaching=false;publish(peer);return;
         }
         if(m.t==='start') {
           // The relay carries identifiers, not assets. New pack entries must not
@@ -89,7 +124,11 @@ export function createRelay(options={}) {
           let musicStart=m.start;
           for(const p of peer.room.values())if(p!==peer && p.state?.emote===m.emote)
             musicStart=Math.min(musicStart,p.state.musicStart??p.state.start);
-          peer.state={emote:m.emote,start:m.start,musicStart};publish(peer);return;
+          if(peer.state?.emote!==m.emote || peer.state?.leader)clearFollowers(peer);
+          const roles=Number.isInteger(m.roles)?Math.max(0,Math.min(8,m.roles)):0;
+          const variants=Number.isInteger(m.variants)?Math.max(0,Math.min(8,m.variants)):0;
+          peer.state={emote:m.emote,start:m.start,musicStart,duplicates:m.duplicates!==false,
+            roles,variants,traversal:m.traversal===true};publish(peer);return;
         }
         throw Error();
       } catch {ws.close(1008,'invalid packet');}

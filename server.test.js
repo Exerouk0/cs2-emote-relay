@@ -99,3 +99,51 @@ test('shared access token is checked before rooms are joined',async t=> {
   ws.send(JSON.stringify({t:'hello',v:1,id:ids[0],room:'match:test',catalog:'fnemotes-v1',token:'wrong'}));
   assert.equal((await once(ws,'close'))[0],1008);assert.equal(f.rooms.size,0);
 });
+
+test('joining reserves unique participant roles, requires arrival, and shares the host epoch',async t=> {
+  const f=await fixture(t),host=await f.client(ids[0]),a=await f.client(ids[1]),b=await f.client(ids[2]);
+  const start=Date.now()-3000;
+  host.send({t:'start',emote:'FutureBand',start,roles:2,duplicates:false});
+  await wait(()=>a.messages.find(m=>m.id===ids[0] && m.emote));
+  a.send({t:'join',leader:ids[0]});b.send({t:'join',leader:ids[0]});
+  const joinedA=await wait(()=>a.messages.find(m=>m.id===ids[1] && m.leader));
+  const joinedB=await wait(()=>b.messages.find(m=>m.id===ids[2] && m.leader));
+  assert.equal(joinedA.approaching,true);assert.equal(joinedB.approaching,true);
+  assert.notEqual(joinedA.role,joinedB.role);assert.equal(joinedA.start,start);
+  const c=await f.client(ids[3]);c.send({t:'join',leader:ids[0]});
+  assert.equal((await wait(()=>c.messages.find(m=>m.t==='joinRejected'))).reason,'full');
+  a.send({t:'ready'});
+  await wait(()=>b.messages.find(m=>m.id===ids[1] && m.leader && !m.approaching));
+  // Updating duplicate visibility must not evict already joined players.
+  host.send({t:'start',emote:'FutureBand',start,roles:2,duplicates:true});
+  await wait(()=>[...f.rooms.values()][0].get(ids[0]).state?.duplicates===true);
+  assert.equal([...f.rooms.values()][0].get(ids[1]).state.leader,ids[0]);
+  b.send({t:'stop'});await wait(()=>[...f.rooms.values()][0].get(ids[0]).state===null);
+  assert.equal([...f.rooms.values()][0].get(ids[1]).state,null);
+});
+
+test('vehicle join colors are randomized non-red variants, consistent in late snapshots',async t=> {
+  const f=await fixture(t),host=await f.client(ids[0]),a=await f.client(ids[1]),b=await f.client(ids[2]);
+  host.send({t:'start',emote:'FutureVehicle',start:Date.now(),variants:3,traversal:true});
+  await wait(()=>a.messages.find(m=>m.id===ids[0] && m.emote));
+  a.send({t:'join',leader:ids[0]});b.send({t:'join',leader:ids[0]});
+  const one=await wait(()=>a.messages.find(m=>m.id===ids[1] && m.leader));
+  const two=await wait(()=>b.messages.find(m=>m.id===ids[2] && m.leader));
+  assert.ok(one.variant>=1 && one.variant<=3);assert.ok(two.variant>=1 && two.variant<=3);
+  assert.notEqual(one.variant,two.variant);assert.equal(one.approaching,false);
+  const late=await f.client(ids[3]);assert.equal(late.messages.find(m=>m.id===ids[1] && m.leader).variant,one.variant);
+  a.send({t:'stop'});await wait(()=>[...f.rooms.values()][0].get(ids[1]).state===null);
+  assert.ok([...f.rooms.values()][0].get(ids[0]).state);assert.ok([...f.rooms.values()][0].get(ids[2]).state);
+  host.ws.close();await wait(()=>[...f.rooms.values()][0].get(ids[2]).state===null);
+});
+
+test('host switches and disconnects remove joined participants',async t=> {
+  const f=await fixture(t),host=await f.client(ids[0]),a=await f.client(ids[1]);
+  host.send({t:'start',emote:'BandA',roles:1,start:Date.now()});
+  await wait(()=>a.messages.find(m=>m.emote==='BandA'));
+  a.send({t:'join',leader:ids[0]});await wait(()=>a.messages.find(m=>m.id===ids[1] && m.leader));
+  host.send({t:'start',emote:'BandB',roles:1,start:Date.now()});
+  await wait(()=>[...f.rooms.values()][0].get(ids[1]).state===null);
+  a.send({t:'join',leader:ids[0]});await wait(()=>a.messages.find(m=>m.id===ids[1] && m.emote==='BandB'));
+  host.ws.close();await wait(()=>[...f.rooms.values()][0].get(ids[1]).state===null);
+});

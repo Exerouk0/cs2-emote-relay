@@ -7,6 +7,25 @@ import {once} from 'node:events';
 import {WebSocket} from 'ws';
 import {createRelay} from './server.js';
 const exe=fileURLToPath(new URL('../work/native_regression/build/Release/production_relay_probe.exe',import.meta.url));
+
+test('production client reserves a role and confirms arrival over WinHTTP',{skip:process.platform!=='win32'||!existsSync(exe),timeout:20000},async t=> {
+  const relay=createRelay();relay.server.listen(0,'127.0.0.1');await once(relay.server,'listening');t.after(()=>relay.close());
+  const url=`ws://127.0.0.1:${relay.server.address().port}/v1`;
+  const host=new WebSocket(url);await once(host,'open');const messages=[];
+  host.on('message',b=>messages.push(JSON.parse(b)));t.after(()=>host.close());
+  host.send(JSON.stringify({t:'hello',v:1,id:'76561198000000001',room:'match:probe',catalog:'fnemotes-state-v1',token:''}));
+  const until=async predicate=>{const end=Date.now()+8000;while(Date.now()<end){const value=predicate();if(value)return value;await new Promise(r=>setTimeout(r,10));}throw Error('native joining timed out');};
+  await until(()=>messages.find(m=>m.t==='welcome'));
+  host.send(JSON.stringify({t:'start',emote:'FutureGroup',roles:1,start:Date.now()-2000,duplicates:false}));
+  await until(()=>messages.find(m=>m.emote==='FutureGroup'));
+  const child=spawn(exe,[url,'76561198000000002','join','FutureGroup','76561198000000001'],{windowsHide:true});t.after(()=>child.kill());
+  let output='';child.stdout.on('data',b=>output+=b);child.stderr.on('data',b=>output+=b);
+  const exit=once(child,'exit');
+  const pending=await until(()=>messages.find(m=>m.id==='76561198000000002' && m.approaching));
+  assert.equal(pending.role,1);assert.equal(pending.leader,'76561198000000001');
+  await until(()=>messages.find(m=>m.id==='76561198000000002' && m.leader && m.approaching===false));
+  assert.equal((await exit)[0],0,output);assert.match(output,/RECEIVED/);
+});
 test('production WinHTTP client connects, late joins, translates timestamps and shuts down',{skip:process.platform!=='win32'||!existsSync(exe),timeout:25000},async t=> {
   const relay=createRelay();relay.server.listen(0,'127.0.0.1');await once(relay.server,'listening');t.after(()=>relay.close());
   const url=`ws://127.0.0.1:${relay.server.address().port}/v1`;
