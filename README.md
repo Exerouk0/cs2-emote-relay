@@ -128,6 +128,16 @@ The server is intentionally one instance with in-memory state. Do not scale it t
 
 ## Local development / verification
 
+Compatible clients load new emote definitions from `Emotes/emote-catalog.json`.
+Keep that file in pack ZIPs; the exporter/release builder generates it automatically.
+Adding asset-pack emotes no longer requires a client DLL or relay redeployment.
+Clients use the stable `fnemotes-state-v1` relay namespace rather than a table hash.
+
+Deploy this server version once for shared song timelines: `musicStart` is the
+same for everyone playing one emote, survives the first dancer leaving, and is
+sent in late-join snapshots. Animation starts remain independent. Existing
+servers still relay emotes, but lack this persistent shared song epoch.
+
 ```powershell
 cd relay
 npm ci

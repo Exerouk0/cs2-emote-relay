@@ -51,6 +51,26 @@ test('disconnect removes player and empty rooms are reclaimed',async t=> {
   assert.equal([...f.rooms.values()][0].get(ids[1]).state,null);
   b.ws.close();await wait(()=>f.rooms.size===0);
 });
+
+test('same emote shares its song epoch through late joins and leader departure',async t=> {
+  const f=await fixture(t),a=await f.client(ids[0]),b=await f.client(ids[1]);
+  const first=Date.now()-7000,second=Date.now()-1000;
+  a.send({t:'start',emote:'PizzaParty',start:first});
+  await wait(()=>b.messages.find(m=>m.id===ids[0] && m.emote));
+  b.send({t:'start',emote:'PizzaParty',start:second});
+  const joined=await wait(()=>b.messages.find(m=>m.id===ids[1] && m.emote));
+  assert.equal(joined.start,second);assert.equal(joined.musicStart,first);
+  a.ws.close();await wait(()=>b.messages.find(m=>m.t==='remove'));
+  const c=await f.client(ids[2]);
+  assert.equal(c.messages.find(m=>m.id===ids[1] && m.emote).musicStart,first);
+  c.send({t:'start',emote:'PizzaParty',start:Date.now()});
+  assert.equal((await wait(()=>c.messages.find(m=>m.id===ids[2] && m.emote))).musicStart,first);
+  b.send({t:'stop'});c.send({t:'stop'});
+  await wait(()=>[...f.rooms.values()][0].get(ids[2]).state===null);
+  const fresh=Date.now();b.send({t:'start',emote:'PizzaParty',start:fresh});
+  const restarted=await wait(()=>b.messages.find(m=>m.id===ids[1] && m.start===fresh));
+  assert.equal(restarted.musicStart,fresh);
+});
 test('clock echo supplies epoch time; malformed and oversized packets are rejected',async t=> {
   const f=await fixture(t),a=await f.client(ids[0]);
   a.send({t:'ping',client:123});const pong=await wait(()=>a.messages.find(m=>m.t==='pong'));

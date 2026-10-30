@@ -1,6 +1,6 @@
 {
   "protocol": 1,
-  "id": "fnemotes-9e3e86aaef68f216cda9",
+  "id": "fnemotes-state-v1",
   "emotes": [
     {
       "name": "Dance Moves",
@@ -839,20 +839,20 @@
     {
       "name": "Get Schwifty",
       "emote": "GetSchwifty",
-      "entrance": 2.366666824,
-      "cycle": 9.066666667
+      "entrance": 2.3667,
+      "cycle": 9.0667
     },
     {
       "name": "Scouse Stepper",
       "emote": "ScouseStepper",
       "entrance": 1.0,
-      "cycle": 13.3
+      "cycle": 13.3007
     },
     {
       "name": "Doot Doot (6 7)",
       "emote": "DootDoot67",
       "entrance": 0,
-      "cycle": 3.577083312
+      "cycle": 3.5667
     },
     {
       "name": "FUTW",
@@ -887,8 +887,8 @@
     {
       "name": "In The End",
       "emote": "InTheEnd",
-      "entrance": 1.628740719,
-      "cycle": 20.566666667
+      "entrance": 1.6287,
+      "cycle": 20.5713
     },
     {
       "name": "Let's Get It Started",
@@ -905,8 +905,8 @@
     {
       "name": "Rap Monster",
       "emote": "RapMonster",
-      "entrance": 1.466666716,
-      "cycle": 23.133374973
+      "entrance": 1.4667,
+      "cycle": 23.1333
     },
     {
       "name": "Deep Explorer",
@@ -930,7 +930,7 @@
       "name": "Reaper's Showtime",
       "emote": "ReapersShowtime",
       "entrance": 0.6,
-      "cycle": 9.233343798
+      "cycle": 9.2333
     },
     {
       "name": "Social Climber",
@@ -995,38 +995,38 @@
     {
       "name": "TV Off",
       "emote": "TvOff",
-      "entrance": 0.733333358,
-      "cycle": 9.533333333
+      "entrance": 0.7333,
+      "cycle": 9.5333
     },
     {
       "name": "Lil' Supercar",
       "emote": "LilSupercar",
       "entrance": 0.8,
-      "cycle": 11.966645924
+      "cycle": 11.9667
     },
     {
       "name": "Scootin' Circles",
       "emote": "ScootinCircles",
-      "entrance": 0.714644329,
-      "cycle": 5.277083333
+      "entrance": 0.7146,
+      "cycle": 5.352
     },
     {
       "name": "Jump Rope Jig",
       "emote": "JumpRopeJig",
-      "entrance": 0.732999989,
-      "cycle": 9.566708441
+      "entrance": 0.733,
+      "cycle": 9.567
     },
     {
       "name": "Lil' Diplodoculus",
       "emote": "LilDiplodoculus",
       "entrance": 0.5,
-      "cycle": 7.741937465
+      "cycle": 7.7333
     },
     {
       "name": "Sunny Stroll",
       "emote": "SunnyStroll",
       "entrance": 0.8,
-      "cycle": 13.0667124
+      "cycle": 13.0667
     },
     {
       "name": "Royal Ride",
@@ -1152,7 +1152,7 @@
       "name": "Cartwheelin'",
       "emote": "Cartwheelin",
       "entrance": 0,
-      "cycle": 1.7351
+      "cycle": 1.7333
     },
     {
       "name": "Full Tilt",
@@ -1235,8 +1235,8 @@
     {
       "name": "Crabby",
       "emote": "Crabby",
-      "entrance": 0.0011,
-      "cycle": 7.6322
+      "entrance": 0,
+      "cycle": 7.6333
     },
     {
       "name": "Lazer Blast",
@@ -1289,8 +1289,8 @@
     {
       "name": "Bouncer",
       "emote": "Bouncer",
-      "entrance": 0.0011,
-      "cycle": 3.0655
+      "entrance": 0,
+      "cycle": 3.0667
     },
     {
       "name": "Breakneck",

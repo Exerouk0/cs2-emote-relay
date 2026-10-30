@@ -84,7 +84,12 @@ export function createRelay(options={}) {
           // require a server redeploy; clients resolve identifiers in their pack.
           if(!emoteOK(m.emote) || !Number.isSafeInteger(m.start) || m.start>now+1000 || m.start<now-86400000)throw Error();
           // The connection can only change its own state. IDs are never taken from event bodies.
-          peer.state={emote:m.emote,start:m.start};publish(peer);return;
+          // Carry the group's original audio epoch across late joins and leader
+          // departures. Body animation retains each dancer's own start time.
+          let musicStart=m.start;
+          for(const p of peer.room.values())if(p!==peer && p.state?.emote===m.emote)
+            musicStart=Math.min(musicStart,p.state.musicStart??p.state.start);
+          peer.state={emote:m.emote,start:m.start,musicStart};publish(peer);return;
         }
         throw Error();
       } catch {ws.close(1008,'invalid packet');}
