@@ -8,7 +8,7 @@ import {WebSocket} from 'ws';
 import {createRelay} from './server.js';
 const exe=fileURLToPath(new URL('../work/native_regression/build/Release/production_relay_probe.exe',import.meta.url));
 
-test('production client reserves a role and confirms arrival over WinHTTP',{skip:process.platform!=='win32'||!existsSync(exe),timeout:20000},async t=> {
+test('production client joins immediately at its native position over WinHTTP',{skip:process.platform!=='win32'||!existsSync(exe),timeout:20000},async t=> {
   const relay=createRelay();relay.server.listen(0,'127.0.0.1');await once(relay.server,'listening');t.after(()=>relay.close());
   const url=`ws://127.0.0.1:${relay.server.address().port}/v1`;
   const host=new WebSocket(url);await once(host,'open');const messages=[];
@@ -21,8 +21,9 @@ test('production client reserves a role and confirms arrival over WinHTTP',{skip
   const child=spawn(exe,[url,'76561198000000002','join','FutureGroup','76561198000000001'],{windowsHide:true});t.after(()=>child.kill());
   let output='';child.stdout.on('data',b=>output+=b);child.stderr.on('data',b=>output+=b);
   const exit=once(child,'exit');
-  const pending=await until(()=>messages.find(m=>m.id==='76561198000000002' && m.approaching));
+  const pending=await until(()=>messages.find(m=>m.id==='76561198000000002' && m.leader));
   assert.equal(pending.role,1);assert.equal(pending.leader,'76561198000000001');
+  assert.equal(pending.approaching,false);assert.deepEqual(pending.slot.p,[125,45,0]);
   await until(()=>messages.find(m=>m.id==='76561198000000002' && m.leader && m.approaching===false));
   assert.equal((await exit)[0],0,output);assert.match(output,/RECEIVED/);
 });

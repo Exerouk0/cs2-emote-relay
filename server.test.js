@@ -15,7 +15,7 @@ test('joining capability is advertised in both health and welcome',async t=> {
   assert.equal(client.messages.find(m=>m.t==='welcome').groupProtocol,2);
   const health=await fetch(`http://127.0.0.1:${f.server.address().port}/healthz`).then(r=>r.json());
   assert.equal(health.groupProtocol,2);assert.equal(health.ok,true);
-  assert.equal(health.build,'native-join-leave-v1');assert.equal(client.messages.find(m=>m.t==='welcome').build,health.build);
+  assert.equal(health.build,'proximity-join-v1');assert.equal(health.freeJoinProtocol,1);assert.equal(client.messages.find(m=>m.t==='welcome').freeJoinProtocol,1);assert.equal(client.messages.find(m=>m.t==='welcome').build,health.build);
 });
 async function fixture(t,options={}) {
   const relay=createRelay(options);relay.server.listen(0,'127.0.0.1');await once(relay.server,'listening');
@@ -32,31 +32,37 @@ async function fixture(t,options={}) {
 }
 async function wait(predicate) {const end=Date.now()+2000;while(Date.now()<end){const result=predicate();if(result)return result;await new Promise(r=>setTimeout(r,5));}throw Error('timed out');}
 
-test('group v2 reserves one canonical pose, validates arrival and preserves it in snapshots',async t=> {
+test('group v2 joins in place immediately and lets the host frame move',async t=> {
   const f=await fixture(t),host=await f.client(ids[0],'match:test','fnemotes-group-v2'),a=await f.client(ids[1],'match:test','fnemotes-group-v2');
   const start=Date.now(),group={id:'test-group',match:true,frame:{p:[100,20,5],yaw:90},slots:[{p:[40,-10,0],yaw:30,asset:'role-sha'}]};
+  const at={p:[102,15,5],yaw:35};
   host.send({t:'start',emote:'FutureBand',start,roles:1,group});
   await wait(()=>a.messages.find(m=>m.group));
-  a.send({t:'join',leader:ids[0],groupId:'wrong-pack'});
+  a.send({t:'join',leader:ids[0],groupId:'wrong-pack',at});
   await wait(()=>a.messages.find(m=>m.t==='joinRejected'));
   a.send({t:'join',leader:ids[0],groupId:group.id});
-  const member=await wait(()=>a.messages.find(m=>m.leader));
-  assert.deepEqual(member.slot,{p:[110,60,5],yaw:120});assert.equal(member.slotAsset,'role-sha');
-  a.send({t:'ready',reservation:'stale',arrival:member.slot});
-  host.send({t:'start',emote:'FutureBand',start,roles:1,group:{...group,frame:{p:[900,900,0],yaw:0}}});
-  await wait(()=>host.messages.filter(m=>m.id===ids[0] && m.group).length>=2);
-  const room=[...f.rooms.values()][0];assert.equal(room.get(ids[1]).state.approaching,true);
-  assert.deepEqual(room.get(ids[0]).state.group.frame,group.frame);
-  a.send({t:'ready',reservation:member.reservation,arrival:{p:[999,0,0],yaw:120}});
   await wait(()=>a.messages.filter(m=>m.t==='joinRejected').length===2);
-  assert.equal(room.get(ids[1]).state.approaching,true);
-  const arrived={p:[111,60,6],yaw:120};
-  a.send({t:'ready',reservation:member.reservation,arrival:arrived});
-  const ready=await wait(()=>host.messages.find(m=>m.leader && !m.approaching));assert.deepEqual(ready.slot,arrived);
+  a.send({t:'join',leader:ids[0],groupId:group.id,at});
+  const member=await wait(()=>a.messages.find(m=>m.leader));
+  assert.deepEqual(member.slot,at);assert.equal(member.slotAsset,'role-sha');
+  assert.equal(member.approaching,false);assert.equal(member.start,start);
+  // A stale old ready packet must not reposition a proximity member.
+  a.send({t:'ready',reservation:member.reservation,arrival:{p:[999,0,0],yaw:120}});
+  const moved={p:[130,20,5],yaw:105};
+  host.send({t:'start',emote:'FutureBand',start,roles:1,group:{...group,frame:moved}});
+  await wait(()=>host.messages.filter(m=>m.id===ids[0] && m.group).length>=2);
+  const room=[...f.rooms.values()][0];assert.equal(room.get(ids[1]).state.approaching,false);
+  assert.deepEqual(room.get(ids[0]).state.group.frame,moved);
+  assert.deepEqual(room.get(ids[1]).state.slot,at);assert.equal(room.get(ids[1]).state.start,start);
   const late=await f.client(ids[2],'match:test','fnemotes-group-v2');
-  assert.deepEqual(late.messages.find(m=>m.leader).slot,arrived);
+  assert.deepEqual(late.messages.find(m=>m.leader).slot,at);
+  a.send({t:'stop'});await wait(()=>room.get(ids[1]).state===null);
+  assert.equal(room.get(ids[0]).state.start,start);
+  late.send({t:'join',leader:ids[0],groupId:group.id,at:{p:[140,25,5],yaw:80}});
+  const replacement=await wait(()=>late.messages.find(m=>m.id===ids[2] && m.leader));
+  assert.equal(replacement.role,member.role);assert.equal(replacement.approaching,false);
   host.send({t:'start',emote:'FutureBand',start:start+200,roles:1,group});
-  await wait(()=>room.get(ids[1]).state===null);
+  await wait(()=>room.get(ids[2]).state===null);
 });
 
 test('state changes reach the same room; other rooms and catalogs remain isolated',async t=> {

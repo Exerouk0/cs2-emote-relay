@@ -4,7 +4,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { pathToFileURL } from 'node:url';
 import { readFileSync } from 'node:fs';
 const catalog=JSON.parse(readFileSync(new URL('./catalog.json',import.meta.url),'utf8'));
-const relayBuild='native-join-leave-v1';
+const relayBuild='proximity-join-v1';
 
 const idOK = x => typeof x === 'string' && /^[0-9]{15,20}$/.test(x);
 const keyOK = x => typeof x === 'string' && /^[A-Za-z0-9_.:-]{1,96}$/.test(x);
@@ -23,7 +23,7 @@ export function createRelay(options={}) {
   const server=http.createServer((req,res)=> {
     if(req.url!=='/healthz') {res.writeHead(404);return res.end();}
     res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});
-    res.end(JSON.stringify({ok:true,protocol:1,groupProtocol:2,build:relayBuild,catalog:catalog.id,epoch,connections:sockets.size,rooms:rooms.size}));
+    res.end(JSON.stringify({ok:true,protocol:1,groupProtocol:2,freeJoinProtocol:1,build:relayBuild,catalog:catalog.id,epoch,connections:sockets.size,rooms:rooms.size}));
   });
   const wss=new WebSocketServer({noServer:true,maxPayload:4096,perMessageDeflate:false});
   function send(ws,data) {
@@ -78,7 +78,7 @@ export function createRelay(options={}) {
           peer.id=m.id;peer.room=room;peer.roomKey=roomKey;peer.state=null;
           peer.strictGroups=m.catalog==='fnemotes-group-v2';
           room.set(peer.id,peer);
-          send(ws,{t:'welcome',epoch,server:now,groupProtocol:2,build:relayBuild});
+          send(ws,{t:'welcome',epoch,server:now,groupProtocol:2,freeJoinProtocol:1,build:relayBuild});
           // Ordered messages on one socket: reset + individual states + complete.
           send(ws,{t:'reset',epoch});
           for(const p of room.values())if(p!==peer && p.state)send(ws,{t:'state',epoch,rev:p.rev,id:p.id,...p.state});
@@ -95,6 +95,7 @@ export function createRelay(options={}) {
           const leader=peer.room.get(m.leader);
           if(!leader?.state || leader.state.leader)return send(ws,{t:'joinRejected',reason:'host unavailable'});
           if(peer.strictGroups && (!groupOK(leader.state.group) || m.groupId!==leader.state.group.id))return send(ws,{t:'joinRejected',reason:'pack mismatch or host not ready'});
+          if(peer.strictGroups && !poseOK(m.at))return send(ws,{t:'joinRejected',reason:'update client for proximity joining'});
           const def={...(catalog.emotes.find(d=>d.emote===leader.state.emote)||{}),
             roles:leader.state.roles||0,variants:leader.state.variants||0,traversal:leader.state.traversal===true};
           if(!def || (!def.roles && !def.variants))return send(ws,{t:'joinRejected',reason:'not joinable'});
@@ -110,9 +111,11 @@ export function createRelay(options={}) {
           const variant=colors.length?colors[Math.floor(Math.random()*colors.length)]:0;
           const group=leader.state.group,localSlot=group?.slots?.[role-1];
           if(peer.strictGroups && def.roles && !localSlot)return send(ws,{t:'joinRejected',reason:'missing role asset'});
-          const canonical=localSlot?worldSlot(group.frame,localSlot):null;
+          // Current clients join where their native pawn stands. The game owns
+          // movement; this initial pose is diagnostic, never a walking target.
+          const canonical=peer.strictGroups?{p:[...m.at.p],yaw:m.at.yaw}:localSlot?worldSlot(group.frame,localSlot):null;
           peer.state={emote:leader.state.emote,start:leader.state.start,musicStart:leader.state.musicStart,
-            leader:leader.id,role,variant,approaching:!def.traversal,duplicates:false,
+            leader:leader.id,role,variant,approaching:!peer.strictGroups && !def.traversal,duplicates:false,
             ...(group?{groupId:group.id,slot:canonical,slotAsset:localSlot?.asset||'',reservation:randomUUID()}:{} )};publish(peer);return;
         }
         if(m.t==='ready') {
@@ -140,8 +143,8 @@ export function createRelay(options={}) {
           const roles=Number.isInteger(m.roles)?Math.max(0,Math.min(8,m.roles)):0;
           const variants=Number.isInteger(m.variants)?Math.max(0,Math.min(8,m.variants)):0;
           let group=groupOK(m.group)?m.group:null;
-          const followers=[...peer.room.values()].some(p=>p.state?.leader===peer.id);
-          if(followers && sameSession && peer.state?.group)group=peer.state.group; // freeze the reserved frame until the group ends
+          const approaching=[...peer.room.values()].some(p=>p.state?.leader===peer.id && p.state.approaching);
+          if(approaching && sameSession && peer.state?.group)group=peer.state.group; // legacy approach only; free groups follow a moving host
           peer.state={emote:m.emote,start:m.start,musicStart,duplicates:m.duplicates!==false,
             roles,variants,traversal:m.traversal===true,...(group?{group}:{})};publish(peer);return;
         }
