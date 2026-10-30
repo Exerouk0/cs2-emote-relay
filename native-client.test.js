@@ -13,10 +13,10 @@ test('production client reserves a role and confirms arrival over WinHTTP',{skip
   const url=`ws://127.0.0.1:${relay.server.address().port}/v1`;
   const host=new WebSocket(url);await once(host,'open');const messages=[];
   host.on('message',b=>messages.push(JSON.parse(b)));t.after(()=>host.close());
-  host.send(JSON.stringify({t:'hello',v:1,id:'76561198000000001',room:'match:probe',catalog:'fnemotes-state-v1',token:''}));
+  host.send(JSON.stringify({t:'hello',v:1,id:'76561198000000001',room:'match:probe',catalog:'fnemotes-group-v2',token:''}));
   const until=async predicate=>{const end=Date.now()+8000;while(Date.now()<end){const value=predicate();if(value)return value;await new Promise(r=>setTimeout(r,10));}throw Error('native joining timed out');};
   await until(()=>messages.find(m=>m.t==='welcome'));
-  host.send(JSON.stringify({t:'start',emote:'FutureGroup',roles:1,start:Date.now()-2000,duplicates:false}));
+  host.send(JSON.stringify({t:'start',emote:'FutureGroup',roles:1,start:Date.now()-2000,duplicates:false,group:{id:'native-group-v2',frame:{p:[100,20,0],yaw:90},match:true,slots:[{p:[40,-10,0],yaw:0,asset:'native-role'}]}}));
   await until(()=>messages.find(m=>m.emote==='FutureGroup'));
   const child=spawn(exe,[url,'76561198000000002','join','FutureGroup','76561198000000001'],{windowsHide:true});t.after(()=>child.kill());
   let output='';child.stdout.on('data',b=>output+=b);child.stderr.on('data',b=>output+=b);

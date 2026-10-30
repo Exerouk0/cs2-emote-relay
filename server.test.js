@@ -10,6 +10,12 @@ test('removed Chugga emote is absent from the published catalog',()=> {
 });
 
 const ids=['76561198000000001','76561198000000002','76561198000000003','76561198000000004'];
+test('joining capability is advertised in both health and welcome',async t=> {
+  const f=await fixture(t),client=await f.client(ids[0],'diagnostic:capability','fnemotes-group-v2');
+  assert.equal(client.messages.find(m=>m.t==='welcome').groupProtocol,2);
+  const health=await fetch(`http://127.0.0.1:${f.server.address().port}/healthz`).then(r=>r.json());
+  assert.equal(health.groupProtocol,2);assert.equal(health.ok,true);
+});
 async function fixture(t,options={}) {
   const relay=createRelay(options);relay.server.listen(0,'127.0.0.1');await once(relay.server,'listening');
   t.after(()=>relay.close());
@@ -24,6 +30,33 @@ async function fixture(t,options={}) {
   return {...relay,client};
 }
 async function wait(predicate) {const end=Date.now()+2000;while(Date.now()<end){const result=predicate();if(result)return result;await new Promise(r=>setTimeout(r,5));}throw Error('timed out');}
+
+test('group v2 reserves one canonical pose, validates arrival and preserves it in snapshots',async t=> {
+  const f=await fixture(t),host=await f.client(ids[0],'match:test','fnemotes-group-v2'),a=await f.client(ids[1],'match:test','fnemotes-group-v2');
+  const start=Date.now(),group={id:'test-group',match:true,frame:{p:[100,20,5],yaw:90},slots:[{p:[40,-10,0],yaw:30,asset:'role-sha'}]};
+  host.send({t:'start',emote:'FutureBand',start,roles:1,group});
+  await wait(()=>a.messages.find(m=>m.group));
+  a.send({t:'join',leader:ids[0],groupId:'wrong-pack'});
+  await wait(()=>a.messages.find(m=>m.t==='joinRejected'));
+  a.send({t:'join',leader:ids[0],groupId:group.id});
+  const member=await wait(()=>a.messages.find(m=>m.leader));
+  assert.deepEqual(member.slot,{p:[110,60,5],yaw:120});assert.equal(member.slotAsset,'role-sha');
+  a.send({t:'ready',reservation:'stale',arrival:member.slot});
+  host.send({t:'start',emote:'FutureBand',start,roles:1,group:{...group,frame:{p:[900,900,0],yaw:0}}});
+  await wait(()=>host.messages.filter(m=>m.id===ids[0] && m.group).length>=2);
+  const room=[...f.rooms.values()][0];assert.equal(room.get(ids[1]).state.approaching,true);
+  assert.deepEqual(room.get(ids[0]).state.group.frame,group.frame);
+  a.send({t:'ready',reservation:member.reservation,arrival:{p:[999,0,0],yaw:120}});
+  await wait(()=>a.messages.filter(m=>m.t==='joinRejected').length===2);
+  assert.equal(room.get(ids[1]).state.approaching,true);
+  const arrived={p:[111,60,6],yaw:120};
+  a.send({t:'ready',reservation:member.reservation,arrival:arrived});
+  const ready=await wait(()=>host.messages.find(m=>m.leader && !m.approaching));assert.deepEqual(ready.slot,arrived);
+  const late=await f.client(ids[2],'match:test','fnemotes-group-v2');
+  assert.deepEqual(late.messages.find(m=>m.leader).slot,arrived);
+  host.send({t:'start',emote:'FutureBand',start:start+200,roles:1,group});
+  await wait(()=>room.get(ids[1]).state===null);
+});
 
 test('state changes reach the same room; other rooms and catalogs remain isolated',async t=> {
   const f=await fixture(t),a=await f.client(ids[0]),b=await f.client(ids[1]);

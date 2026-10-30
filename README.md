@@ -153,6 +153,7 @@ Local URL: `ws://127.0.0.1:10000/v1`; health: `http://127.0.0.1:10000/healthz`. 
 * **Health works but CONNECTED never appears:** the DLL URL needs `/v1`; UptimeRobot uses `/healthz`. Check the token and allow outbound HTTPS.
 * **Both connected but no remote emotes:** verify the same match/room, matching DLL/catalog and pack. Leave `relay_room` blank for automatic discovery, or make sure any manual override matches. Look for `relay-session` lines in `Documents/Emotes/emotes.log` to compare the detected mode, Steam ID, human count, lobby and room. Steam ID zero/bots cannot advertise as human Steam users.
 * **Server restarts:** clients reconnect and republish active state automatically. RAM-only state is expected to reset on deployment.
+* **Update relay to join:** open `/healthz`. The current server reports `"groupProtocol":2` there and in its WebSocket welcome. If this field is absent, the hosted deployment is older than the joining protocol, even if health is OK and ordinary emotes synchronize. Deploy the current `server.js`; pack/DLL replacement alone cannot update a hosted server. Keep your existing Render environment variables.
 
 ## Sources checked
 
@@ -165,6 +166,10 @@ Local URL: `ws://127.0.0.1:10000/v1`; health: `http://127.0.0.1:10000/healthz`. 
 * [Microsoft: WinHTTP concurrency and cancellation](https://learn.microsoft.com/en-us/windows/win32/winhttp/concurrency-in-winhttp)
 
 ## Emote joining
+
+The current group protocol is `fnemotes-group-v2`: update the relay, both clients' DLLs and their generated pack catalogs together for this migration. Old clients remain isolated in their old catalog rooms. Future ordinary pack additions do not require another protocol update.
+
+The host publishes its frame and actor-local participant slots with model fingerprints. The server reserves one world-space slot and a reservation nonce. Clients reject mismatched role assets before approaching. Ready messages must match that nonce and report arrival within four horizontal units; the committed render origin is the actual arrival position. Snapshots preserve this same pose. The host frame stays frozen while a participant holds a reservation. A changed host session invalidates existing reservations.
 
 Deploy the joining-capable server and client DLL once. The host advertises bounded role/variant counts from its pack catalog. The server reserves a unique role on `join`, publishes an approaching participant, and activates it on `ready`. Participants inherit the host's animation/song epochs. A host switch, stop, disconnect or room change removes dependent participants; a non-traversal participant cancellation stops its group. Vehicle colors are assigned on the server, exclude the red host color, prefer unused non-red variants, and remain in snapshots.
 

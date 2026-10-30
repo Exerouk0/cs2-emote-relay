@@ -8,6 +8,9 @@ const catalog=JSON.parse(readFileSync(new URL('./catalog.json',import.meta.url),
 const idOK = x => typeof x === 'string' && /^[0-9]{15,20}$/.test(x);
 const keyOK = x => typeof x === 'string' && /^[A-Za-z0-9_.:-]{1,96}$/.test(x);
 const emoteOK = x => typeof x === 'string' && /^[A-Za-z0-9_]{1,100}$/.test(x);
+const poseOK=x=>x && Array.isArray(x.p) && x.p.length===3 && x.p.every(v=>Number.isFinite(v)&&Math.abs(v)<1000000) && Number.isFinite(x.yaw) && Math.abs(x.yaw)<1000000;
+const groupOK=g=>g && keyOK(g.id) && poseOK(g.frame) && Array.isArray(g.slots) && g.slots.length<=8 && g.slots.every(s=>poseOK(s)&&keyOK(s.asset));
+const worldSlot=(frame,slot)=>{const a=frame.yaw*Math.PI/180,c=Math.cos(a),s=Math.sin(a);return {p:[frame.p[0]+c*slot.p[0]-s*slot.p[1],frame.p[1]+s*slot.p[0]+c*slot.p[1],frame.p[2]+slot.p[2]],yaw:frame.yaw+slot.yaw};};
 const same = (a,b) => { const x=Buffer.from(a),y=Buffer.from(b);return x.length===y.length && timingSafeEqual(x,y); };
 
 // RAM only. One instance owns a room; horizontal scaling needs shared pub/sub.
@@ -19,7 +22,7 @@ export function createRelay(options={}) {
   const server=http.createServer((req,res)=> {
     if(req.url!=='/healthz') {res.writeHead(404);return res.end();}
     res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});
-    res.end(JSON.stringify({ok:true,protocol:1,catalog:catalog.id,epoch,connections:sockets.size,rooms:rooms.size}));
+    res.end(JSON.stringify({ok:true,protocol:1,groupProtocol:2,catalog:catalog.id,epoch,connections:sockets.size,rooms:rooms.size}));
   });
   const wss=new WebSocketServer({noServer:true,maxPayload:4096,perMessageDeflate:false});
   function send(ws,data) {
@@ -78,8 +81,9 @@ export function createRelay(options={}) {
           if(!room){room=new Map();rooms.set(roomKey,room);}
           if(room.has(m.id) || room.size>=limits.room)return ws.close(1008,'duplicate identity or full room');
           peer.id=m.id;peer.room=room;peer.roomKey=roomKey;peer.state=null;
+          peer.strictGroups=m.catalog==='fnemotes-group-v2';
           room.set(peer.id,peer);
-          send(ws,{t:'welcome',epoch,server:now});
+          send(ws,{t:'welcome',epoch,server:now,groupProtocol:2});
           // Ordered messages on one socket: reset + individual states + complete.
           send(ws,{t:'reset',epoch});
           for(const p of room.values())if(p!==peer && p.state)send(ws,{t:'state',epoch,rev:p.rev,id:p.id,...p.state});
@@ -94,6 +98,7 @@ export function createRelay(options={}) {
           if(!idOK(m.leader) || m.leader===peer.id)throw Error();
           const leader=peer.room.get(m.leader);
           if(!leader?.state || leader.state.leader)return send(ws,{t:'joinRejected',reason:'host unavailable'});
+          if(peer.strictGroups && (!groupOK(leader.state.group) || m.groupId!==leader.state.group.id))return send(ws,{t:'joinRejected',reason:'pack mismatch or host not ready'});
           const def={...(catalog.emotes.find(d=>d.emote===leader.state.emote)||{}),
             roles:leader.state.roles||0,variants:leader.state.variants||0,traversal:leader.state.traversal===true};
           if(!def || (!def.roles && !def.variants))return send(ws,{t:'joinRejected',reason:'not joinable'});
@@ -107,11 +112,21 @@ export function createRelay(options={}) {
           const available=Array.from({length:variants},(_,i)=>i+1).filter(n=>!occupied.some(p=>p.state.variant===n));
           const colors=available.length?available:Array.from({length:variants},(_,i)=>i+1);
           const variant=colors.length?colors[Math.floor(Math.random()*colors.length)]:0;
+          const group=leader.state.group,localSlot=group?.slots?.[role-1];
+          if(peer.strictGroups && def.roles && !localSlot)return send(ws,{t:'joinRejected',reason:'missing role asset'});
+          const canonical=localSlot?worldSlot(group.frame,localSlot):null;
           peer.state={emote:leader.state.emote,start:leader.state.start,musicStart:leader.state.musicStart,
-            leader:leader.id,role,variant,approaching:!def.traversal,duplicates:false};publish(peer);return;
+            leader:leader.id,role,variant,approaching:!def.traversal,duplicates:false,
+            ...(group?{groupId:group.id,slot:canonical,slotAsset:localSlot?.asset||'',reservation:randomUUID()}:{} )};publish(peer);return;
         }
         if(m.t==='ready') {
           if(!peer.state?.leader || !peer.state.approaching)return;
+          if(peer.strictGroups) {
+            if(m.reservation!==peer.state.reservation)return;
+            if(!poseOK(m.arrival) || !peer.state.slot || Math.hypot(m.arrival.p[0]-peer.state.slot.p[0],m.arrival.p[1]-peer.state.slot.p[1])>4 || Math.abs(m.arrival.p[2]-peer.state.slot.p[2])>64)
+              return send(ws,{t:'joinRejected',reason:'not at reserved slot'});
+            peer.state.slot.p=[...m.arrival.p]; // final visible actor origin equals the actual arrival, on every client
+          }
           peer.state.approaching=false;publish(peer);return;
         }
         if(m.t==='start') {
@@ -124,11 +139,15 @@ export function createRelay(options={}) {
           let musicStart=m.start;
           for(const p of peer.room.values())if(p!==peer && p.state?.emote===m.emote)
             musicStart=Math.min(musicStart,p.state.musicStart??p.state.start);
-          if(peer.state?.emote!==m.emote || peer.state?.leader)clearFollowers(peer);
+          const sameSession=peer.state?.emote===m.emote && !peer.state?.leader && Math.abs(peer.state.start-m.start)<50;
+          if(!sameSession)clearFollowers(peer);
           const roles=Number.isInteger(m.roles)?Math.max(0,Math.min(8,m.roles)):0;
           const variants=Number.isInteger(m.variants)?Math.max(0,Math.min(8,m.variants)):0;
+          let group=groupOK(m.group)?m.group:null;
+          const followers=[...peer.room.values()].some(p=>p.state?.leader===peer.id);
+          if(followers && sameSession && peer.state?.group)group=peer.state.group; // freeze the reserved frame until the group ends
           peer.state={emote:m.emote,start:m.start,musicStart,duplicates:m.duplicates!==false,
-            roles,variants,traversal:m.traversal===true};publish(peer);return;
+            roles,variants,traversal:m.traversal===true,...(group?{group}:{})};publish(peer);return;
         }
         throw Error();
       } catch {ws.close(1008,'invalid packet');}
