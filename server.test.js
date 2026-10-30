@@ -15,6 +15,7 @@ test('joining capability is advertised in both health and welcome',async t=> {
   assert.equal(client.messages.find(m=>m.t==='welcome').groupProtocol,2);
   const health=await fetch(`http://127.0.0.1:${f.server.address().port}/healthz`).then(r=>r.json());
   assert.equal(health.groupProtocol,2);assert.equal(health.ok,true);
+  assert.equal(health.build,'native-join-leave-v1');assert.equal(client.messages.find(m=>m.t==='welcome').build,health.build);
 });
 async function fixture(t,options={}) {
   const relay=createRelay(options);relay.server.listen(0,'127.0.0.1');await once(relay.server,'listening');
@@ -147,12 +148,21 @@ test('joining reserves unique participant roles, requires arrival, and shares th
   assert.equal((await wait(()=>c.messages.find(m=>m.t==='joinRejected'))).reason,'full');
   a.send({t:'ready'});
   await wait(()=>b.messages.find(m=>m.id===ids[1] && m.leader && !m.approaching));
+  b.send({t:'ready'});
+  await wait(()=>a.messages.find(m=>m.id===ids[2] && m.leader && !m.approaching));
   // Updating duplicate visibility must not evict already joined players.
   host.send({t:'start',emote:'FutureBand',start,roles:2,duplicates:true});
   await wait(()=>[...f.rooms.values()][0].get(ids[0]).state?.duplicates===true);
   assert.equal([...f.rooms.values()][0].get(ids[1]).state.leader,ids[0]);
-  b.send({t:'stop'});await wait(()=>[...f.rooms.values()][0].get(ids[0]).state===null);
-  assert.equal([...f.rooms.values()][0].get(ids[1]).state,null);
+  b.send({t:'stop'});await wait(()=>[...f.rooms.values()][0].get(ids[2]).state===null);
+  assert.equal([...f.rooms.values()][0].get(ids[0]).state.start,start);
+  assert.equal([...f.rooms.values()][0].get(ids[1]).state.leader,ids[0]);
+  c.send({t:'join',leader:ids[0]});
+  const replacement=await wait(()=>c.messages.find(m=>m.id===ids[3] && m.leader));
+  assert.equal(replacement.role,joinedB.role);assert.equal(replacement.start,start);
+  a.ws.close();await wait(()=>![...f.rooms.values()][0].has(ids[1]));
+  assert.equal([...f.rooms.values()][0].get(ids[0]).state.start,start);
+  assert.equal([...f.rooms.values()][0].get(ids[3]).state.leader,ids[0]);
 });
 
 test('vehicle join colors are randomized non-red variants, consistent in late snapshots',async t=> {

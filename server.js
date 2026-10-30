@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { pathToFileURL } from 'node:url';
 import { readFileSync } from 'node:fs';
 const catalog=JSON.parse(readFileSync(new URL('./catalog.json',import.meta.url),'utf8'));
+const relayBuild='native-join-leave-v1';
 
 const idOK = x => typeof x === 'string' && /^[0-9]{15,20}$/.test(x);
 const keyOK = x => typeof x === 'string' && /^[A-Za-z0-9_.:-]{1,96}$/.test(x);
@@ -22,7 +23,7 @@ export function createRelay(options={}) {
   const server=http.createServer((req,res)=> {
     if(req.url!=='/healthz') {res.writeHead(404);return res.end();}
     res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'});
-    res.end(JSON.stringify({ok:true,protocol:1,groupProtocol:2,catalog:catalog.id,epoch,connections:sockets.size,rooms:rooms.size}));
+    res.end(JSON.stringify({ok:true,protocol:1,groupProtocol:2,build:relayBuild,catalog:catalog.id,epoch,connections:sockets.size,rooms:rooms.size}));
   });
   const wss=new WebSocketServer({noServer:true,maxPayload:4096,perMessageDeflate:false});
   function send(ws,data) {
@@ -34,12 +35,6 @@ export function createRelay(options={}) {
   function publish(peer,cancelledEmote='') {
     peer.rev=++revision;
     broadcast(peer.room,{t:'state',epoch,rev:peer.rev,id:peer.id,...peer.state,...(cancelledEmote?{cancelledEmote}:{})});
-  }
-  function stopGroup(peer) {
-    const leader=peer.state?.leader||peer.id;
-    for(const p of peer.room?.values()||[])if(p.id===leader || p.state?.leader===leader) {
-      const emote=p.state?.emote;p.state=null;publish(p,emote);
-    }
   }
   function clearFollowers(peer) {
     for(const p of peer.room?.values()||[])if(p.state?.leader===peer.id) {const emote=p.state.emote;p.state=null;publish(p,emote);}
@@ -83,7 +78,7 @@ export function createRelay(options={}) {
           peer.id=m.id;peer.room=room;peer.roomKey=roomKey;peer.state=null;
           peer.strictGroups=m.catalog==='fnemotes-group-v2';
           room.set(peer.id,peer);
-          send(ws,{t:'welcome',epoch,server:now,groupProtocol:2});
+          send(ws,{t:'welcome',epoch,server:now,groupProtocol:2,build:relayBuild});
           // Ordered messages on one socket: reset + individual states + complete.
           send(ws,{t:'reset',epoch});
           for(const p of room.values())if(p!==peer && p.state)send(ws,{t:'state',epoch,rev:p.rev,id:p.id,...p.state});
@@ -91,8 +86,9 @@ export function createRelay(options={}) {
         }
         if(!peer.room)return ws.close(1008,'hello required');
         if(m.t==='stop') {
-          if(peer.state?.leader && !peer.room.get(peer.state.leader)?.state?.traversal)stopGroup(peer);
-          else {clearFollowers(peer);peer.state=null;publish(peer);}return;
+          // A participant owns only its membership. Host stop still removes
+          // dependents, but leaving a role must not stop the host or siblings.
+          clearFollowers(peer);peer.state=null;publish(peer);return;
         }
         if(m.t==='join') {
           if(!idOK(m.leader) || m.leader===peer.id)throw Error();
